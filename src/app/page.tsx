@@ -1,15 +1,14 @@
 import Content from "@/components/content";
-import Link from "next/link";
 
 export default function Home() {
   return (
     <div>
       <h1>My Homepage</h1>
       <p>
-        <Link href="/api/auth/login">Login</Link>
+        <a href="/api/auth/login">Login</a>
       </p>
       <p>
-        <Link href="/api/auth/logout">Logout</Link>
+        <a href="/api/auth/logout">Logout</a>
       </p>
       <p></p>
       <Content />
