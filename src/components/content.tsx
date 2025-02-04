@@ -17,7 +17,7 @@ export default function Content() {
     setState((previous) => ({ ...previous, isLoading: true }));
 
     try {
-      const response = await fetch("/api/categories");
+      const response = await fetch("/api/category");
       const data = await response.json();
 
       setState((previous) => ({
