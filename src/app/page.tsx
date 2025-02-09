@@ -12,6 +12,7 @@ export default function Home() {
       </p>
       <p></p>
       <Content />
+      <p className="text-lg text-red-500">This should be red</p>
     </div>
   );
 }
