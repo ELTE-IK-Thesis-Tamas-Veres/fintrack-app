@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0";
 
 const Navbar = () => {
   const { user } = useUser();
@@ -54,7 +54,7 @@ const Navbar = () => {
               variant="secondary"
               className="hidden md:block ms-2 px-2"
             >
-              <a href="/api/auth/login">Login</a>
+              <a href="/auth/login">Login</a>
             </Button>
             <Button className="hidden md:block ml-2 mr-2">Get Started</Button>
           </>

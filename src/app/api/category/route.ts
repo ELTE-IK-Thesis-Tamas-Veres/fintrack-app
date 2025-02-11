@@ -1,5 +1,4 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
-import { withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { NextResponse } from "next/server";
 
 interface categoryResponse {
@@ -7,7 +6,7 @@ interface categoryResponse {
   name: string;
 }
 
-export const GET = withApiAuthRequired(async (req) => {
+export const GET = async () => {
   try {
     const resp: categoryResponse[] = await callFinTrackServices<
       categoryResponse[]
@@ -15,7 +14,7 @@ export const GET = withApiAuthRequired(async (req) => {
 
     console.log(resp);
 
-    return NextResponse.json(resp, req);
+    return NextResponse.json(resp);
   } catch (error: unknown) {
     console.error("API Request Failed:", error);
     return NextResponse.json(
@@ -23,4 +22,4 @@ export const GET = withApiAuthRequired(async (req) => {
       { status: 500 }
     );
   }
-});
+};
