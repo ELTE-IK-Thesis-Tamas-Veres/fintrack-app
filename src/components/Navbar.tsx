@@ -10,18 +10,25 @@ import { nanoid } from "nanoid";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { usePathname } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
   const { user } = useUser();
 
+  const pathname = usePathname();
+
+  const isActive = (path: string) =>
+    pathname === path ? "text-primary font-medium" : "";
+
   return (
     <div className="container bg-card py-3 px-4 flex items-center justify-between gap-6 rounded-2xl mt-2 mb-3">
       <ul className="hidden md:flex items-center gap-10 text-card-foreground">
-        <li className="text-primary font-medium">
+        <li className={isActive("/")}>
           <Link href="/">Home</Link>
         </li>
-        <li>
-          <a href="#features">Features</a>
+        <li className={isActive("/categories")}>
+          <Link href="/categories">Categories</Link>
         </li>
         <li>
           <a href="#pricing">Pricing</a>
@@ -59,13 +66,26 @@ const Navbar = () => {
             <Button className="hidden md:block ml-2 mr-2">Get Started</Button>
           </>
         ) : (
-          <Button
-            asChild
-            variant="secondary"
-            className="hidden md:block ms-2 px-2"
-          >
-            <a href="/api/auth/logout">Log out</a>
-          </Button>
+          <>
+            <Avatar>
+              {user.picture && user.name && (
+                <AvatarImage
+                  src={user.picture}
+                  alt={user.name}
+                  width={50}
+                  height={50}
+                />
+              )}
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <Button
+              asChild
+              variant="secondary"
+              className="hidden md:block ms-2 px-2"
+            >
+              <a href="/api/auth/logout">Log out</a>
+            </Button>
+          </>
         )}
 
         <div className="flex md:hidden mr-2 items-center gap-2">

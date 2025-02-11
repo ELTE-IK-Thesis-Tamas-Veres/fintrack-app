@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
 
-export default function ThemeWrapper({
+export default function PageWrapper({
   children,
 }: Readonly<{
   children: React.ReactNode;
