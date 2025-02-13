@@ -16,8 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 const Navbar = () => {
   const { user } = useUser();
 
-  console.log("user: ", user);
-
   const pathname = usePathname();
 
   const isActive = (path: string) =>

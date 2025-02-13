@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0";
 import { NodeRendererProps, Tree } from "react-arborist";
 import {
@@ -26,6 +26,7 @@ import {
 import { Button } from "./ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -36,112 +37,103 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { describe } from "node:test";
+import { ToastAction } from "./ui/toast";
+import { AddCategoryRequest } from "@/app/api/category/route";
+import { EditCategoryRequest } from "@/app/api/category/[categoryId]/route";
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 export default function CategoriesTree() {
   const { user } = useUser();
-
-  const [state, setState] = useState({
-    isLoading: false,
-    response: undefined,
-    error: undefined,
-  });
-  /*
   const { toast } = useToast();
 
-  // 1. Data State
-  const [categories, setCategories] = useState([]);
-
-  // 2. UI State for Dialog
   const [isAddCategoryDialogOpen, setIsAddCategoryDDialogOpen] =
     useState(false);
 
-  // 3. Form State for New Category
-  const [formData, setFormData] = useState({ name: "" });
+  const [state, setState] = useState({
+    isLoading: false,
+    response: [],
+    error: undefined,
+  });
 
-  // 4. Loading State for API Call
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  /*
+  const createCategoryHandler = async (name: string) => {
+    const reqBody: AddCategoryRequest = { name: name };
+
+    await fetch("/api/category", {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+    });
+
+    await fetchCategories();
+
+    toast({
+      title: "Category successfully created",
+      description: `Category ${name} has been created`,
+    });
+
+    console.log("category created");
+  };
+
+  const deleteCategoryHandler = async (id: number) => {
+    await fetch(`/api/category/${id}`, {
+      method: "DELETE",
+    });
+
+    await fetchCategories();
+
+    toast({
+      title: "Category deleted",
+      description: "Category has been deleted",
+    });
+
+    console.log("category deleted");
+  };
+
+  const editCategoryHandler = async (id: number, name: string) => {
+    const reqBody: EditCategoryRequest = { name: name };
+
+    await fetch(`/api/category/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(reqBody),
+    });
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        console.log(data);
-        setCategories(data);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-      }
-    };
-
     //fetchCategories();
   }, []);
-
-  const handleSave = async () => {
-    setIsSubmitting(true);
-    // Close the dialog immediately (optimistic UI)
-    setIsAddCategoryDDialogOpen(false);
-
-    try {
-      const res = await fetch("/api/categories", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) throw new Error("API error");
-
-      // Show success notification
-      toast({
-        title: "Category added",
-        description: "Your category has been added successfully",
-      });
-
-      // Refetch the updated list of categories
-      const updatedRes = await fetch("/api/categories");
-      const updatedData = await updatedRes.json();
-      setCategories(updatedData);
-    } catch (error) {
-      console.error("Error adding category:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add category",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };*/
-  const data = [
-    { id: "1", name: "Unread" },
-    { id: "2", name: "Threads" },
-    {
-      id: "3",
-      name: "Chat Rooms",
-      children: [
-        { id: "c1", name: "General" },
-        { id: "c2", name: "Random" },
-        {
-          id: "c3",
-          name: "Open Source Projects",
-          children: [
-            { id: "g1", name: "Alice" },
-            { id: "g2", name: "Bob" },
-            { id: "g3", name: "Charlie" },
-          ],
-        },
-      ],
-    },
-    {
-      id: "4",
-      name: "Direct Messages",
-      children: [
-        { id: "d1", name: "Alice" },
-        { id: "d2", name: "Bob" },
-        { id: "d3", name: "Charlie" },
-      ],
-    },
-  ];
+  // const data = [
+  //   { id: "1", name: "Unread" },
+  //   { id: "2", name: "Threads" },
+  //   {
+  //     id: "3",
+  //     name: "Chat Rooms",
+  //     children: [
+  //       { id: "c1", name: "General" },
+  //       { id: "c2", name: "Random" },
+  //       {
+  //         id: "c3",
+  //         name: "Open Source Projects",
+  //         children: [
+  //           { id: "g1", name: "Alice" },
+  //           { id: "g2", name: "Bob" },
+  //           { id: "g3", name: "Charlie" },
+  //         ],
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "4",
+  //     name: "Direct Messages",
+  //     children: [
+  //       { id: "d1", name: "Alice" },
+  //       { id: "d2", name: "Bob" },
+  //       { id: "d3", name: "Charlie" },
+  //     ],
+  //   },
+  // ];
 
   const fetchCategories = async () => {
     setState((previous) => ({ ...previous, isLoading: true }));
@@ -149,6 +141,8 @@ export default function CategoriesTree() {
     try {
       const response = await fetch("/api/category");
       const data = await response.json();
+
+      console.log(data);
 
       setState((previous) => ({
         ...previous,
@@ -158,7 +152,7 @@ export default function CategoriesTree() {
     } catch (error) {
       setState((previous) => ({
         ...previous,
-        response: undefined,
+        response: [],
         error: undefined,
       }));
     } finally {
@@ -175,6 +169,17 @@ export default function CategoriesTree() {
 
   return (
     <>
+      <Button
+        onClick={() =>
+          toast({
+            title: "Scheduled: Catch up ",
+            description: "Friday, February 10, 2023 at 5:57 PM",
+            action: (
+              <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+            ),
+          })
+        }
+      />
       <div>
         <button
           className="btn btn-blue"
@@ -191,7 +196,7 @@ export default function CategoriesTree() {
           <div className="result-block" data-testid="external-result">
             <h6 className="muted">Result</h6>
             {error && <p>error</p>}
-            {response && <p>{JSON.stringify(response, null, 2)}</p>}
+            {response && <p>{response.length}</p>}
           </div>
         )}
       </div>
@@ -203,58 +208,55 @@ export default function CategoriesTree() {
           </div>
         )}
       </>
-      <Dialog
-      // open={isAddCategoryDialogOpen}
-      // onOpenChange={setIsAddCategoryDDialogOpen}
-      >
-        <DialogTrigger asChild>
-          <Button variant="outline">Add Category</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
-              Create new category. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                defaultValue="Pedro Duarte"
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Tree
-        data={data}
+      <CreateCategoryDialog
+        isOpen={isAddCategoryDialogOpen}
+        setIsOpen={setIsAddCategoryDDialogOpen}
+        createCategoryHandler={createCategoryHandler}
+      />
+      <Tree<Category>
+        data={state.response}
         onMove={({ dragIds, parentId, index }) =>
           console.log("moved", dragIds, parentId, index)
         }
+        rowHeight={30}
+        height={800}
+        width={600}
       >
-        {Node}
+        {(nodeProps) => (
+          <Node
+            {...nodeProps}
+            deleteCategoryHandler={deleteCategoryHandler}
+            editCategoryHandler={editCategoryHandler}
+          />
+        )}
       </Tree>
     </>
   );
 }
 
-function Node({ node, style, dragHandle }: NodeRendererProps<any>) {
+const Node = ({
+  node,
+  style,
+  dragHandle,
+  deleteCategoryHandler,
+  editCategoryHandler,
+}: NodeRendererProps<Category> & {
+  deleteCategoryHandler: (id: number) => void;
+  editCategoryHandler: (id: number, name: string) => void;
+}) => {
   /* This node instance can do many things. See the API reference. */
-  //const { setIsDeleteCategoryDialogOpen } = useCategoryDialog();
   return (
-    <div style={style} ref={dragHandle}>
-      <span className="inline-flex items-center space-x-1">
+    <div
+      className={node.isSelected ? "bg-chart-5 rounded-md" : ""}
+      style={style}
+      ref={dragHandle}
+    >
+      <span className="pl-2 inline-flex items-center space-x-1">
         <span
           className="inline-flex items-center space-x-1"
-          onClick={() => node.toggle()}
+          onClick={() => {
+            node.toggle();
+          }}
         >
           {node.isLeaf ? (
             <Folder size={16} strokeWidth={2.25} />
@@ -265,27 +267,27 @@ function Node({ node, style, dragHandle }: NodeRendererProps<any>) {
           )}
           <span>{node.data.name}</span>
         </span>
-        {/* <Trash2
-          onClick={() => setIsDeleteCategoryDialogOpen(true)}
-          size={16}
-          strokeWidth={2.25}
-        /> */}
-        {/* <DeleteAlertDialog id={node.data.id} />
-        <EditDialog id={node.data.id} currentName={node.data.name} /> */}
+        <DeleteCategoryDialog
+          id={node.data.id}
+          deleteCategory={deleteCategoryHandler}
+        />
+        <EditCatgeoryDialog
+          id={node.data.id}
+          currentName={node.data.name}
+          editCategoryHandler={editCategoryHandler}
+        />
       </span>
     </div>
   );
-}
-
-const deleteCategory = (id) => {
-  console.log("delete:", id.id);
 };
 
-const editCategory = (id, name) => {
-  console.log("edit:", id, name);
-};
-/*
-const DeleteAlertDialog = ({ id }: { id: string }) => {
+const DeleteCategoryDialog = ({
+  id,
+  deleteCategory,
+}: {
+  id: number;
+  deleteCategory: (id: number) => void;
+}) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -301,7 +303,10 @@ const DeleteAlertDialog = ({ id }: { id: string }) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteCategory(id)}>
+          <AlertDialogAction
+            className="bg-destructive"
+            onClick={() => deleteCategory(id)}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -310,12 +315,67 @@ const DeleteAlertDialog = ({ id }: { id: string }) => {
   );
 };
 
-const EditDialog = ({
+const CreateCategoryDialog = ({
+  isOpen,
+  setIsOpen,
+  createCategoryHandler,
+}: {
+  isOpen: boolean;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  createCategoryHandler: (name: string) => void;
+}) => {
+  const [name, setName] = useState("new category name");
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Category</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Create new category</DialogTitle>
+          <DialogDescription>
+            Create new category. Click save when you&apos;re done.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Name
+            </Label>
+            <Input
+              id="name"
+              className="col-span-3"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Close
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button onClick={() => createCategoryHandler(name)} type="submit">
+              Save changes
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditCatgeoryDialog = ({
   id,
   currentName,
+  editCategoryHandler,
 }: {
-  id: string;
+  id: number;
   currentName: string;
+  editCategoryHandler: (id: number, name: string) => void;
 }) => {
   const [name, setName] = useState(currentName);
 
@@ -330,7 +390,7 @@ const EditDialog = ({
         <DialogHeader>
           <DialogTitle>Edit category</DialogTitle>
           <DialogDescription>
-            Make changes to your category. Click save when you're done.
+            Make changes to your category. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -350,7 +410,7 @@ const EditDialog = ({
         <DialogFooter>
           <Button
             onClick={() => {
-              editCategory(id, name);
+              editCategoryHandler(id, name);
               setIsOpen(false);
             }}
             type="submit"
@@ -362,4 +422,3 @@ const EditDialog = ({
     </Dialog>
   );
 };
-*/

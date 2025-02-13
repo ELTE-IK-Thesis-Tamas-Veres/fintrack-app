@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
+import { Toaster } from "./ui/toaster";
 
 export default function PageWrapper({
   children,
@@ -31,6 +32,7 @@ export default function PageWrapper({
         <main className="container mx-auto p-4 bg-background border-t">
           {children}
         </main>
+        <Toaster />
       </ThemeProvider>
     </div>
   );
