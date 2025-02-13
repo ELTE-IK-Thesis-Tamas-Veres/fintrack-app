@@ -14,6 +14,8 @@ import { useUser } from "@auth0/nextjs-auth0";
 const Navbar = () => {
   const { user } = useUser();
 
+  console.log("user: ", user);
+
   return (
     <div className="container bg-card py-3 px-4 flex items-center justify-between gap-6 rounded-2xl mt-2 mb-3">
       <ul className="hidden md:flex items-center gap-10 text-card-foreground">
@@ -47,14 +49,14 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center">
-        {user == null ? (
+        {user === null ? (
           <>
             <Button
               asChild
               variant="secondary"
               className="hidden md:block ms-2 px-2"
             >
-              <a href="/auth/login">Login</a>
+              <a href="/auth/login?returnTo=http://localhost:3000">Login</a>
             </Button>
             <Button className="hidden md:block ml-2 mr-2">Get Started</Button>
           </>
@@ -64,7 +66,7 @@ const Navbar = () => {
             variant="secondary"
             className="hidden md:block ms-2 px-2"
           >
-            <a href="/api/auth/logout">Log out</a>
+            <a href="/auth/logout?returnTo=http://localhost:3000">Log out</a>
           </Button>
         )}
 
@@ -107,7 +109,7 @@ const Navbar = () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Button asChild variant="secondary" className="w-full text-sm">
-                  <a href="/api/auth/login">Login</a>
+                  <a href="/auth/login">Login</a>
                 </Button>
               </DropdownMenuItem>
               <DropdownMenuItem>

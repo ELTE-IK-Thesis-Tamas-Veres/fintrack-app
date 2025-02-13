@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   const session = await auth0.getSession(request);
 
-  if (!session) {
+  if (!session && false) {
     // user is not authenticated, redirect to login page
     return NextResponse.redirect(
       new URL("/auth/login", request.nextUrl.origin)
@@ -26,14 +26,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  await auth0.updateSession(request, authRes, {
-    ...session,
-    user: {
-      ...session.user,
-      // add custom user data
-      updatedAt: Date.now(),
-    },
-  });
+  // await auth0.updateSession(request, authRes, {
+  //   ...session,
+  //   user: {
+  //     ...session.user,
+  //     // add custom user data
+  //     updatedAt: Date.now(),
+  //   },
+  // });
 
   // the headers from the auth middleware should always be returned
   return authRes;
