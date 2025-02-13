@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser } from "@auth0/nextjs-auth0";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
   const { user } = useUser();
+
+  console.log("user: ", user);
 
   const pathname = usePathname();
 
@@ -54,14 +56,14 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center">
-        {user == null ? (
+        {!user ? (
           <>
             <Button
               asChild
               variant="secondary"
               className="hidden md:block ms-2 px-2"
             >
-              <a href="/api/auth/login">Login</a>
+              <a href="/auth/login?returnTo=http://localhost:3000">Login</a>
             </Button>
             <Button className="hidden md:block ml-2 mr-2">Get Started</Button>
           </>
@@ -83,7 +85,7 @@ const Navbar = () => {
               variant="secondary"
               className="hidden md:block ms-2 px-2"
             >
-              <a href="/api/auth/logout">Log out</a>
+              <a href="/auth/logout">Log out</a>
             </Button>
           </>
         )}
@@ -127,7 +129,7 @@ const Navbar = () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Button asChild variant="secondary" className="w-full text-sm">
-                  <a href="/api/auth/login">Login</a>
+                  <a href="/auth/login">Login</a>
                 </Button>
               </DropdownMenuItem>
               <DropdownMenuItem>

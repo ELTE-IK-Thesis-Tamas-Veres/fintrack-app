@@ -1,4 +1,4 @@
-import { getAccessToken } from "@auth0/nextjs-auth0";
+import { auth0 } from "@/lib/auth0";
 
 export async function callFinTrackServices<T>(
   endpoint: string,
@@ -10,12 +10,12 @@ export async function callFinTrackServices<T>(
       "Content-Type": "application/json",
     };
 
-    const { accessToken } = await getAccessToken();
+    const accessToken = await auth0.getAccessToken();
 
-    console.log("Access Token:", accessToken);
+    //console.log("Access Token:", accessToken);
 
     if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
+      headers["Authorization"] = `Bearer ${accessToken.token}`;
     }
 
     const requestOptions: RequestInit = {
@@ -29,7 +29,7 @@ export async function callFinTrackServices<T>(
       requestOptions
     );
 
-    console.log(response);
+    //console.log(response);
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
