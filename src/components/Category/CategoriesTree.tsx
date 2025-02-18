@@ -148,14 +148,6 @@ export default function CategoriesTree() {
   //   },
   // ];
 
-  const handle = async (
-    event: React.MouseEvent<HTMLButtonElement>,
-    fn: () => Promise<void>
-  ) => {
-    event.preventDefault();
-    await fn();
-  };
-
   //const { isLoading, response, error } = state;
 
   return (

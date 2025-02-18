@@ -27,7 +27,7 @@ const CategoryNode = ({
     >
       <span className="pl-2 inline-flex items-center space-x-1">
         <span
-          className="inline-flex items-center space-x-1"
+          className="cursor-pointer inline-flex items-center space-x-1"
           onClick={() => {
             node.toggle();
           }}
