@@ -1,4 +1,12 @@
+import { ChevronDown, ChevronRight, Folder } from "lucide-react";
 import { NodeRendererProps } from "react-arborist";
+import DeleteCategoryDialog from "./DeleteCategoryDialog";
+import EditCategoryDialog from "./EditCategoryDialog";
+
+export interface Category {
+  id: number;
+  name: string;
+}
 
 const CategoryNode = ({
   node,
