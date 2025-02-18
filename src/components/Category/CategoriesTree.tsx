@@ -12,10 +12,10 @@ import {
 import { EditCategoryRequest } from "@/app/api/category/[categoryId]/route";
 import CategoryNode, { Category } from "./CategoryNode";
 import CreateCategoryDialog from "./CreateCategoryDialog";
+import { Button } from "../ui/button";
 
 export default function CategoriesTree() {
-  const [isAddCategoryDialogOpen, setIsAddCategoryDDialogOpen] =
-    useState(false);
+  const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
 
   const [state, setState] = useState({
     isLoading: false,
@@ -160,7 +160,60 @@ export default function CategoriesTree() {
 
   return (
     <>
-      <div>
+      <div className="max-w-6xl mx-auto p-6">
+        {/* Header */}
+        <header className="mb-6">
+          <h1 className="text-3xl font-bold">Manage Categories</h1>
+          <p className="text-muted-foreground">
+            Create, edit, delete, and move your categories easily.
+          </p>
+        </header>
+
+        {/* Action Toolbar */}
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex space-x-2">
+            <CreateCategoryDialog
+              isOpen={isAddCategoryDialogOpen}
+              setIsOpen={setIsAddCategoryDialogOpen}
+              createCategoryHandler={createCategoryHandler}
+            />
+            <Button variant="outline" onClick={fetchCategories}>
+              Refresh
+            </Button>
+          </div>
+          {state.isLoading && (
+            <span className="text-sm text-muted-foreground">Loading...</span>
+          )}
+        </div>
+
+        {/* Categories Tree Card */}
+        <div className="bg-card p-4 rounded-md shadow-sm border">
+          {state.response.length === 0 ? (
+            <p className="text-center text-muted-foreground py-6">
+              No categories available. Start by creating one!
+            </p>
+          ) : (
+            <Tree<Category>
+              data={state.response}
+              onMove={({ dragIds, parentId }) =>
+                moveCategoryHandler(dragIds, parentId)
+              }
+              rowHeight={40}
+              height={600}
+              width={800}
+            >
+              {(nodeProps) => (
+                <CategoryNode
+                  {...nodeProps}
+                  deleteCategoryHandler={deleteCategoryHandler}
+                  editCategoryHandler={editCategoryHandler}
+                />
+              )}
+            </Tree>
+          )}
+        </div>
+      </div>
+      {/* <div>
         <button
           className="btn btn-blue"
           color="primary"
@@ -169,7 +222,7 @@ export default function CategoriesTree() {
         >
           Ping API
         </button>
-      </div>
+      </div> */}
       {/*<div className="result-block-container">
         {isLoading && <div className="loading">Loading...</div>}
         {(error || response) && (
@@ -188,9 +241,9 @@ export default function CategoriesTree() {
           </div>
         )}
       </>*/}
-      <CreateCategoryDialog
+      {/* <CreateCategoryDialog
         isOpen={isAddCategoryDialogOpen}
-        setIsOpen={setIsAddCategoryDDialogOpen}
+        setIsOpen={setIsAddCategoryDialogOpen}
         createCategoryHandler={createCategoryHandler}
       />
       <Tree<Category>
@@ -209,7 +262,7 @@ export default function CategoriesTree() {
             editCategoryHandler={editCategoryHandler}
           />
         )}
-      </Tree>
+      </Tree> */}
     </>
   );
 }
