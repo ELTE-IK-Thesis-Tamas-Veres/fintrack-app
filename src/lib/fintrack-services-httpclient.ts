@@ -13,7 +13,7 @@ export async function callFinTrackServices<T>(
     // 🔥 Ensure token retrieval is handled properly
     const authHeader = request?.headers.get("Authorization");
 
-    console.log("🔑 Authorization Header:", authHeader);
+    //console.log("🔑 Authorization Header:", authHeader);
 
     if (authHeader) {
       headers["Authorization"] = authHeader;
