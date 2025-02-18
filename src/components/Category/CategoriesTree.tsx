@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Tree } from "react-arborist";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 import { toast } from "sonner";
 
@@ -179,30 +180,36 @@ export default function CategoriesTree() {
         </div>
 
         {/* Categories Tree Card */}
-        <div className="bg-card p-4 rounded-md shadow-sm border">
-          {state.response.length === 0 ? (
-            <p className="text-center text-muted-foreground py-6">
-              No categories available. Start by creating one!
-            </p>
-          ) : (
-            <Tree<Category>
-              data={state.response}
-              onMove={({ dragIds, parentId }) =>
-                moveCategoryHandler(dragIds, parentId)
-              }
-              rowHeight={40}
-              height={600}
-              width={800}
-            >
-              {(nodeProps) => (
-                <CategoryNode
-                  {...nodeProps}
-                  deleteCategoryHandler={deleteCategoryHandler}
-                  editCategoryHandler={editCategoryHandler}
-                />
-              )}
-            </Tree>
-          )}
+        <div className="bg-card p-4 rounded-md shadow-sm border h-[600px]">
+          <>
+            {state.response.length === 0 ? (
+              <p className="text-center text-muted-foreground py-6">
+                No categories available. Start by creating one!
+              </p>
+            ) : (
+              <AutoSizer>
+                {({ width, height }) => (
+                  <Tree<Category>
+                    data={state.response}
+                    onMove={({ dragIds, parentId }) =>
+                      moveCategoryHandler(dragIds, parentId)
+                    }
+                    rowHeight={40}
+                    height={height}
+                    width={width}
+                  >
+                    {(nodeProps) => (
+                      <CategoryNode
+                        {...nodeProps}
+                        deleteCategoryHandler={deleteCategoryHandler}
+                        editCategoryHandler={editCategoryHandler}
+                      />
+                    )}
+                  </Tree>
+                )}
+              </AutoSizer>
+            )}
+          </>
         </div>
       </div>
       {/* <div>
