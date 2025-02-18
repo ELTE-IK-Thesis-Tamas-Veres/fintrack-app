@@ -1,6 +1,5 @@
-import { auth0 } from "@/lib/auth0";
-
 export async function callFinTrackServices<T>(
+  request: Request,
   endpoint: string,
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: unknown
@@ -12,10 +11,12 @@ export async function callFinTrackServices<T>(
     };
 
     // 🔥 Ensure token retrieval is handled properly
-    const accessToken = await auth0.getAccessToken();
+    const authHeader = request?.headers.get("Authorization");
 
-    if (accessToken?.token) {
-      headers["Authorization"] = `Bearer ${accessToken.token}`;
+    console.log("🔑 Authorization Header:", authHeader);
+
+    if (authHeader) {
+      headers["Authorization"] = authHeader;
     }
 
     console.log(

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { auth0 } from "./lib/auth0";
 
 export async function middleware(request: NextRequest) {
-  const authRes = await auth0.middleware(request);
+  let authRes = await auth0.middleware(request);
 
   if (request.nextUrl.pathname.startsWith("/auth")) {
     return authRes;
@@ -24,18 +24,28 @@ export async function middleware(request: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // 🔥 Get Access Token and ensure it's refreshed
+    const { token } = await auth0.getAccessToken(request, authRes);
+
+    if (!token) {
+      return NextResponse.redirect(
+        new URL("/auth/login", request.nextUrl.origin)
+      );
+    }
+
+    const modifiedHeaders = new Headers(request.headers);
+    modifiedHeaders.set("Authorization", `Bearer ${token}`);
+
+    const resWithHeaders = NextResponse.next({
+      request: {
+        headers: modifiedHeaders,
+      },
+    });
+
+    authRes = resWithHeaders;
   }
 
-  // await auth0.updateSession(request, authRes, {
-  //   ...session,
-  //   user: {
-  //     ...session.user,
-  //     // add custom user data
-  //     updatedAt: Date.now(),
-  //   },
-  // });
-
-  // the headers from the auth middleware should always be returned
   return authRes;
 }
 

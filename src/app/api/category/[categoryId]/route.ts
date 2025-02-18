@@ -14,6 +14,7 @@ export const PUT = async (
     console.log("Updating Category:", params.categoryId, "with data:", body);
 
     const resp = await callFinTrackServices(
+      req,
       `category/${params.categoryId}`,
       "PUT",
       body
@@ -41,6 +42,7 @@ export const DELETE = async (
     console.log("Deleting Category:", params.categoryId);
 
     const resp = await callFinTrackServices(
+      req,
       `category/${params.categoryId}`,
       "DELETE"
     );

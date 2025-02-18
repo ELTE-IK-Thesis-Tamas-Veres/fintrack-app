@@ -3,7 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
-import { Toaster } from "./ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function PageWrapper({
   children,

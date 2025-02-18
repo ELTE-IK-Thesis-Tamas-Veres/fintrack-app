@@ -5,16 +5,11 @@ interface categoryResponse {
   id: number;
   name: string;
 }
-
-export interface AddCategoryRequest {
-  name: string;
-}
-
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
     const resp: categoryResponse[] | null = await callFinTrackServices<
       categoryResponse[]
-    >("category", "GET");
+    >(req, "category", "GET");
 
     return NextResponse.json(resp);
   } catch (error: unknown) {
@@ -26,6 +21,10 @@ export const GET = async () => {
   }
 };
 
+export interface AddCategoryRequest {
+  name: string;
+}
+
 export const POST = async (req: Request) => {
   try {
     // 🔥 Parse request body
@@ -33,7 +32,7 @@ export const POST = async (req: Request) => {
     console.log("Received Body:", body);
 
     // 🔥 Call external API
-    const resp = await callFinTrackServices("category", "POST", body);
+    const resp = await callFinTrackServices(req, "category", "POST", body);
 
     console.log("API Response:", resp);
 
@@ -43,6 +42,30 @@ export const POST = async (req: Request) => {
     }
 
     // ✅ Return successful response
+    return NextResponse.json(resp, { status: 200 });
+  } catch (error: unknown) {
+    console.error("❌ API Request Failed:", error);
+
+    return NextResponse.json(
+      { error: (error as Error).message || "Unknown error occurred" },
+      { status: 500 }
+    );
+  }
+};
+
+export interface EditCategoriesParentRequest {
+  categoryIds: number[];
+  parentId: number | null;
+}
+
+export const PUT = async (req: Request) => {
+  try {
+    const body = await req.json();
+    console.log("Received Body:", body);
+
+    // 🔥 Call external API
+    const resp = await callFinTrackServices(req, "category", "PUT", body);
+
     return NextResponse.json(resp, { status: 200 });
   } catch (error: unknown) {
     console.error("❌ API Request Failed:", error);

@@ -1,7 +1,6 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useUser } from "@auth0/nextjs-auth0";
 import { NodeRendererProps, Tree } from "react-arborist";
 import {
   ChevronDown,
@@ -10,6 +9,8 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+
+import { toast } from "sonner";
 
 import {
   AlertDialogHeader,
@@ -36,9 +37,10 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "./ui/toast";
-import { AddCategoryRequest } from "@/app/api/category/route";
+import {
+  AddCategoryRequest,
+  EditCategoriesParentRequest,
+} from "@/app/api/category/route";
 import { EditCategoryRequest } from "@/app/api/category/[categoryId]/route";
 
 interface Category {
@@ -47,9 +49,6 @@ interface Category {
 }
 
 export default function CategoriesTree() {
-  const { user } = useUser();
-  const { toast } = useToast();
-
   const [isAddCategoryDialogOpen, setIsAddCategoryDDialogOpen] =
     useState(false);
 
@@ -58,6 +57,35 @@ export default function CategoriesTree() {
     response: [],
     error: undefined,
   });
+
+  const fetchCategories = async () => {
+    setState((previous) => ({ ...previous, isLoading: true }));
+
+    try {
+      const response = await fetch("/api/category");
+      const data = await response.json();
+
+      console.log(data);
+
+      setState((previous) => ({
+        ...previous,
+        response: data,
+        error: undefined,
+      }));
+    } catch (error) {
+      setState((previous) => ({
+        ...previous,
+        response: [],
+        error: undefined,
+      }));
+    } finally {
+      setState((previous) => ({ ...previous, isLoading: false }));
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const createCategoryHandler = async (name: string) => {
     const reqBody: AddCategoryRequest = { name: name };
@@ -69,27 +97,21 @@ export default function CategoriesTree() {
 
     await fetchCategories();
 
-    toast({
-      title: "Category successfully created",
+    toast("Category successfully created", {
       description: `Category ${name} has been created`,
     });
-
-    console.log("category created");
   };
 
-  const deleteCategoryHandler = async (id: number) => {
+  const deleteCategoryHandler = async (id: number, name: string) => {
     await fetch(`/api/category/${id}`, {
       method: "DELETE",
     });
 
     await fetchCategories();
 
-    toast({
-      title: "Category deleted",
-      description: "Category has been deleted",
+    toast("Category deleted", {
+      description: `Category '${name}' has been deleted successfully`,
     });
-
-    console.log("category deleted");
   };
 
   const editCategoryHandler = async (id: number, name: string) => {
@@ -99,11 +121,37 @@ export default function CategoriesTree() {
       method: "PUT",
       body: JSON.stringify(reqBody),
     });
+
+    await fetchCategories();
+
+    toast("Category modified", {
+      description: `Category has been modified successfully`,
+    });
   };
 
-  useEffect(() => {
-    //fetchCategories();
-  }, []);
+  const moveCategoryHandler = async (
+    dragIds: string[],
+    parentId: string | null
+  ) => {
+    const reqBody: EditCategoriesParentRequest = {
+      categoryIds: dragIds.map((id) => parseInt(id)),
+      parentId: parentId ? parseInt(parentId) : null,
+    };
+
+    console.log(reqBody);
+
+    await fetch("/api/category", {
+      method: "PUT",
+      body: JSON.stringify(reqBody),
+    });
+
+    await fetchCategories();
+
+    toast("Category moved", {
+      description: `Category has been moved successfully`,
+    });
+  };
+
   // const data = [
   //   { id: "1", name: "Unread" },
   //   { id: "2", name: "Threads" },
@@ -135,51 +183,18 @@ export default function CategoriesTree() {
   //   },
   // ];
 
-  const fetchCategories = async () => {
-    setState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/category");
-      const data = await response.json();
-
-      console.log(data);
-
-      setState((previous) => ({
-        ...previous,
-        response: data,
-        error: undefined,
-      }));
-    } catch (error) {
-      setState((previous) => ({
-        ...previous,
-        response: [],
-        error: undefined,
-      }));
-    } finally {
-      setState((previous) => ({ ...previous, isLoading: false }));
-    }
-  };
-
-  const handle = async (event, fn) => {
+  const handle = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+    fn: () => Promise<void>
+  ) => {
     event.preventDefault();
     await fn();
   };
 
-  const { isLoading, response, error } = state;
+  //const { isLoading, response, error } = state;
 
   return (
     <>
-      <Button
-        onClick={() =>
-          toast({
-            title: "Scheduled: Catch up ",
-            description: "Friday, February 10, 2023 at 5:57 PM",
-            action: (
-              <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-            ),
-          })
-        }
-      />
       <div>
         <button
           className="btn btn-blue"
@@ -190,7 +205,7 @@ export default function CategoriesTree() {
           Ping API
         </button>
       </div>
-      <div className="result-block-container">
+      {/*<div className="result-block-container">
         {isLoading && <div className="loading">Loading...</div>}
         {(error || response) && (
           <div className="result-block" data-testid="external-result">
@@ -207,7 +222,7 @@ export default function CategoriesTree() {
             <p>{user.email}</p>
           </div>
         )}
-      </>
+      </>*/}
       <CreateCategoryDialog
         isOpen={isAddCategoryDialogOpen}
         setIsOpen={setIsAddCategoryDDialogOpen}
@@ -215,15 +230,15 @@ export default function CategoriesTree() {
       />
       <Tree<Category>
         data={state.response}
-        onMove={({ dragIds, parentId, index }) =>
-          console.log("moved", dragIds, parentId, index)
+        onMove={({ dragIds, parentId }) =>
+          moveCategoryHandler(dragIds, parentId)
         }
         rowHeight={30}
         height={800}
         width={600}
       >
         {(nodeProps) => (
-          <Node
+          <CategoryNode
             {...nodeProps}
             deleteCategoryHandler={deleteCategoryHandler}
             editCategoryHandler={editCategoryHandler}
@@ -234,14 +249,14 @@ export default function CategoriesTree() {
   );
 }
 
-const Node = ({
+const CategoryNode = ({
   node,
   style,
   dragHandle,
   deleteCategoryHandler,
   editCategoryHandler,
 }: NodeRendererProps<Category> & {
-  deleteCategoryHandler: (id: number) => void;
+  deleteCategoryHandler: (id: number, name: string) => void;
   editCategoryHandler: (id: number, name: string) => void;
 }) => {
   /* This node instance can do many things. See the API reference. */
@@ -258,7 +273,7 @@ const Node = ({
             node.toggle();
           }}
         >
-          {node.isLeaf ? (
+          {node.children?.length == 0 ? (
             <Folder size={16} strokeWidth={2.25} />
           ) : node.isOpen ? (
             <ChevronDown />
@@ -269,9 +284,10 @@ const Node = ({
         </span>
         <DeleteCategoryDialog
           id={node.data.id}
+          name={node.data.name}
           deleteCategory={deleteCategoryHandler}
         />
-        <EditCatgeoryDialog
+        <EditCategoryDialog
           id={node.data.id}
           currentName={node.data.name}
           editCategoryHandler={editCategoryHandler}
@@ -283,10 +299,12 @@ const Node = ({
 
 const DeleteCategoryDialog = ({
   id,
+  name,
   deleteCategory,
 }: {
   id: number;
-  deleteCategory: (id: number) => void;
+  name: string;
+  deleteCategory: (id: number, name: string) => void;
 }) => {
   return (
     <AlertDialog>
@@ -305,7 +323,7 @@ const DeleteCategoryDialog = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive"
-            onClick={() => deleteCategory(id)}
+            onClick={() => deleteCategory(id, name)}
           >
             Delete
           </AlertDialogAction>
@@ -368,7 +386,7 @@ const CreateCategoryDialog = ({
   );
 };
 
-const EditCatgeoryDialog = ({
+const EditCategoryDialog = ({
   id,
   currentName,
   editCategoryHandler,
@@ -400,6 +418,7 @@ const EditCatgeoryDialog = ({
             </Label>
             <Input
               onKeyDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
