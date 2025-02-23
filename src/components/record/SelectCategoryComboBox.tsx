@@ -48,9 +48,13 @@ const statuses: Status[] = [
 ];*/
 
 export function SelectCategoryComboBox({
-  selectedCategoryId,
+  initiallySelectedCategoryId,
+  selectedCategory,
+  setSelectedCategory,
 }: {
-  selectedCategoryId?: number;
+  initiallySelectedCategoryId?: number;
+  selectedCategory: GetCategoryResponse | null;
+  setSelectedCategory: (category: GetCategoryResponse | null) => void;
 }) {
   const [categoriesState, setCategoriesState] = React.useState<{
     isLoading: boolean;
@@ -98,17 +102,19 @@ export function SelectCategoryComboBox({
   }, []);
 
   React.useEffect(() => {
-    if (selectedCategoryId) {
+    if (initiallySelectedCategoryId) {
       const selectedCategory = categoriesState.response.find(
-        (category) => category.id === selectedCategoryId
+        (category) => category.id === initiallySelectedCategoryId
       );
       setSelectedCategory(selectedCategory || null);
     }
-  }, [categoriesState.response, selectedCategoryId]);
+  }, [
+    categoriesState.response,
+    initiallySelectedCategoryId,
+    setSelectedCategory,
+  ]);
 
   const [open, setOpen] = React.useState(false);
-  const [selectedCategory, setSelectedCategory] =
-    React.useState<GetCategoryResponse | null>(null);
 
   return (
     <>

@@ -1,7 +1,17 @@
+import { GetCategoryResponse } from "@/app/api/category/route";
+
 export type Record = {
-  id: string;
+  id: number;
   date: Date;
-  category: string;
+  category: GetCategoryResponse;
+  description: string;
+  amount: number;
+};
+
+export type EditRecordRequest = {
+  id: number;
+  date: string;
+  categoryId: number | null;
   description: string;
   amount: number;
 };

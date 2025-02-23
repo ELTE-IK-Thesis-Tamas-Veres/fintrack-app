@@ -30,14 +30,35 @@ import {
 } from "../ui/select";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
-import { toast } from "sonner";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
+import { CreateRecordRequest } from "@/app/api/record/route";
+import { GetCategoryResponse } from "@/app/api/category/route";
 
-export function CreateRecordSheet() {
+export function CreateRecordSheet({
+  createRecordHandler,
+}: {
+  createRecordHandler: (request: CreateRecordRequest) => Promise<void>;
+}) {
   const [description, setDescription] =
     React.useState<string>("set description");
   const [amount, setAmount] = React.useState<number>(1234);
-  const [date, setDate] = React.useState<Date>(new Date());
+  const today: Date = new Date();
+  const [date, setDate] = React.useState<Date>(today);
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<GetCategoryResponse | null>(null);
+
+  const submitHandler = async () => {
+    const formattedDate = date.toISOString().split("T")[0];
+
+    const body: CreateRecordRequest = {
+      amount: amount,
+      categoryId: selectedCategory ? selectedCategory.id : null,
+      date: formattedDate,
+      description: description,
+    };
+
+    await createRecordHandler(body);
+  };
 
   return (
     <Sheet>
@@ -97,7 +118,10 @@ export function CreateRecordSheet() {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <SelectCategoryComboBox />
+            <SelectCategoryComboBox
+              setSelectedCategory={setSelectedCategory}
+              selectedCategory={selectedCategory}
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="date" className="text-right">
@@ -136,7 +160,13 @@ export function CreateRecordSheet() {
                   </SelectContent>
                 </Select>
                 <div className="rounded-md border">
-                  <Calendar mode="single" selected={date} onSelect={setDate} />
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(day) => {
+                      if (day) setDate(day);
+                    }}
+                  />
                 </div>
               </PopoverContent>
             </Popover>
@@ -144,24 +174,12 @@ export function CreateRecordSheet() {
         </div>
         <SheetFooter>
           <SheetClose asChild>
-            <Button
-              onClick={() => {
-                toast("Error creating category", {
-                  description: "An error occurred while creating the category",
-                });
-              }}
-              type="submit"
-              variant={"secondary"}
-            >
+            <Button type="submit" variant={"secondary"}>
               Close
             </Button>
           </SheetClose>
           <Button
-            onClick={() => {
-              toast("Error creating category", {
-                description: "An error occurred while creating the category",
-              });
-            }}
+            onClick={() => submitHandler()}
             type="submit"
             variant={"default"}
           >

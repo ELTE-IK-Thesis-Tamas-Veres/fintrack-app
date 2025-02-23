@@ -10,19 +10,10 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 
 import * as React from "react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
@@ -38,118 +29,116 @@ import {
 } from "../ui/select";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
-import { toast } from "sonner";
+import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
+import { GetCategoryResponse } from "@/app/api/category/route";
 
-type Status = {
-  value: string;
-  label: string;
-};
+import { EditRecordRequest, Record } from "@/types/Record";
 
-const statuses: Status[] = [
-  {
-    value: "backlog",
-    label: "Backlog",
-  },
-  {
-    value: "todo",
-    label: "Todo",
-  },
-  {
-    value: "in progress",
-    label: "In Progress",
-  },
-  {
-    value: "done",
-    label: "Done",
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-  },
-];
-
-export function EditRecordSheet() {
-  const [open, setOpen] = React.useState(false);
-  const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
-    null
+export function EditRecordSheet({
+  editRecordHandler,
+  original,
+  isSheetOpen,
+  setIsSheetOpen,
+}: {
+  editRecordHandler: (request: EditRecordRequest) => Promise<void>;
+  original: Record;
+  isSheetOpen: boolean;
+  setIsSheetOpen: (isOpen: boolean) => void;
+}) {
+  console.log(original);
+  const [description, setDescription] = React.useState<string>(
+    original.description
   );
+  const [amount, setAmount] = React.useState<number>(original.amount);
+  const [date, setDate] = React.useState<Date>(new Date(original.date));
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<GetCategoryResponse | null>(null);
 
-  const [date, setDate] = React.useState<Date>();
+  React.useEffect(() => {
+    setDescription(original.description);
+    setAmount(original.amount);
+    setDate(new Date(original.date));
+    setSelectedCategory(original.category ?? null);
+  }, [original]);
+
+  const submitHandler = async () => {
+    const formattedDate = date.toISOString().split("T")[0];
+
+    const body: EditRecordRequest = {
+      id: original.id,
+      amount: amount,
+      categoryId: selectedCategory ? selectedCategory.id : null,
+      date: formattedDate,
+      description: description,
+    };
+
+    console.log(body);
+
+    await editRecordHandler(body);
+  };
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline">Open</Button>
-      </SheetTrigger>
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit profile</SheetTitle>
+          <SheetTitle>Edit record</SheetTitle>
           <SheetDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
+            You can edit the details of the record here.
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
+            <Label htmlFor="description" className="text-right">
+              Description
             </Label>
             <Input
-              onChange={() => {}}
-              id="name"
-              value="Pedro Duarte"
+              onChange={(e) => {
+                setDescription(e.target.value);
+              }}
+              id="description"
+              value={description}
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">
-              Username
+              Amount
             </Label>
             <Input
-              onChange={() => {}}
+              onChange={(e) => {
+                const value = e.target.value.trim(); // Remove unnecessary spaces
+                const parsed = parseInt(value, 10);
+
+                // Check if parsed is a valid number and matches the input
+                if (!isNaN(parsed) && value === parsed.toString()) {
+                  setAmount(parsed);
+                } else if (value === "") {
+                  setAmount(0);
+                } else if (value.startsWith("0")) {
+                  const sliced = value.slice(1);
+                  const slicedParsed = parseInt(sliced);
+
+                  if (
+                    !isNaN(slicedParsed) &&
+                    sliced === slicedParsed.toString()
+                  ) {
+                    setAmount(slicedParsed);
+                  }
+                }
+              }}
               id="username"
-              value="@peduarte"
+              value={amount}
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Status</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[150px] justify-start">
-                  {selectedStatus ? (
-                    <>{selectedStatus.label}</>
-                  ) : (
-                    <>+ Set status</>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="p-0" side="right" align="start">
-                <Command>
-                  <CommandInput placeholder="Change status..." />
-                  <CommandList>
-                    <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup>
-                      {statuses.map((status) => (
-                        <CommandItem
-                          key={status.value}
-                          value={status.value}
-                          onSelect={(value) => {
-                            setSelectedStatus(
-                              statuses.find(
-                                (priority) => priority.value === value
-                              ) || null
-                            );
-                            setOpen(false);
-                          }}
-                        >
-                          {status.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <SelectCategoryComboBox
+              setSelectedCategory={setSelectedCategory}
+              selectedCategory={selectedCategory}
+              initiallySelectedCategoryId={
+                original.category ? original.category.id : undefined
+              }
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="date" className="text-right">
@@ -188,31 +177,29 @@ export function EditRecordSheet() {
                   </SelectContent>
                 </Select>
                 <div className="rounded-md border">
-                  <Calendar mode="single" selected={date} onSelect={setDate} />
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(day) => {
+                      if (day) setDate(day);
+                    }}
+                  />
                 </div>
               </PopoverContent>
             </Popover>
           </div>
         </div>
         <SheetFooter>
-          <Button
-            onClick={() => {
-              toast("Error creating category", {
-                description: "An error occurred while creating the category",
-              });
-            }}
-            type="submit"
-          >
-            Save changes
-          </Button>
+          <SheetClose asChild>
+            <Button type="submit" variant={"secondary"}>
+              Close
+            </Button>
+          </SheetClose>
           <SheetClose asChild>
             <Button
-              onClick={() => {
-                toast("Error creating category", {
-                  description: "An error occurred while creating the category",
-                });
-              }}
+              onClick={() => submitHandler()}
               type="submit"
+              variant={"default"}
             >
               Save changes
             </Button>
