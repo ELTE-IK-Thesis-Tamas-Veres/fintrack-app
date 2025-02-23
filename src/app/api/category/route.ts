@@ -1,14 +1,15 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
 import { NextResponse } from "next/server";
 
-interface categoryResponse {
+export interface GetCategoryResponse {
   id: number;
   name: string;
 }
+
 export const GET = async (req: Request) => {
   try {
-    const resp: categoryResponse[] | null = await callFinTrackServices<
-      categoryResponse[]
+    const resp: GetCategoryResponse[] | null = await callFinTrackServices<
+      GetCategoryResponse[]
     >(req, "category", "GET");
 
     return NextResponse.json(resp);

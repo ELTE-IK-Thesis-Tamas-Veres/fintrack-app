@@ -1,9 +1,9 @@
-import CategoriesTree from "@/components/Category/CategoriesTree";
+import CategoryManager from "@/components/category/CategoryManager";
 
 export default function Page() {
   return (
     <>
-      <CategoriesTree />
+      <CategoryManager />
     </>
   );
 }

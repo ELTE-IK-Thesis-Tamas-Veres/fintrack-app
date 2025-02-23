@@ -30,7 +30,7 @@ export default function CategoriesTree() {
     setState((previous) => ({ ...previous, isLoading: true }));
 
     try {
-      const response = await fetch("/api/category");
+      const response = await fetch("/api/category/tree");
       const data = await response.json();
 
       if (data.error) {

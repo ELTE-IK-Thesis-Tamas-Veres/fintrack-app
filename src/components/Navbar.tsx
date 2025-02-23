@@ -30,8 +30,8 @@ const Navbar = () => {
         <li className={isActive("/categories")}>
           <Link href="/categories">Categories</Link>
         </li>
-        <li>
-          <a href="#pricing">Pricing</a>
+        <li className={isActive("/records")}>
+          <Link href="/records">Records</Link>
         </li>
         <li>
           <a href="#faqs">FAQs</a>
@@ -120,7 +120,7 @@ const Navbar = () => {
                 <a href="#features">Features</a>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <a href="#pricing">Pricing</a>
+                <a href="/records">Records</a>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <a href="#faqs">FAQs</a>
