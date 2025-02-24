@@ -294,7 +294,7 @@ export default function RecordManager() {
         </div>
       </div>
       <div className="bg-card p-4 rounded-md shadow-md border">
-        {recordsDataState.isLoading ? (
+        {recordsDataState.isLoading && recordsDataState.response.length == 0 ? (
           <p className="text-center text-muted-foreground py-6">
             Loading records...
           </p>
