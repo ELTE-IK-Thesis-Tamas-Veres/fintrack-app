@@ -24,20 +24,28 @@ export default function CategoriesTree() {
     error: undefined,
   });
 
+  console.log(state);
+
   const fetchCategories = async () => {
     setState((previous) => ({ ...previous, isLoading: true }));
 
     try {
-      const response = await fetch("/api/category");
+      const response = await fetch("/api/category/tree");
       const data = await response.json();
 
-      console.log(data);
-
-      setState((previous) => ({
-        ...previous,
-        response: data,
-        error: undefined,
-      }));
+      if (data.error) {
+        setState((previous) => ({
+          ...previous,
+          response: [],
+          error: data.error,
+        }));
+      } else {
+        setState((previous) => ({
+          ...previous,
+          response: data,
+          error: undefined,
+        }));
+      }
     } catch (error) {
       setState((previous) => ({
         ...previous,
@@ -56,10 +64,17 @@ export default function CategoriesTree() {
   const createCategoryHandler = async (name: string) => {
     const reqBody: AddCategoryRequest = { name: name };
 
-    await fetch("/api/category", {
+    const resp: Response = await fetch("/api/category", {
       method: "POST",
       body: JSON.stringify(reqBody),
     });
+
+    if (resp.status == 500) {
+      toast("Error creating category", {
+        description: "An error occurred while creating the category",
+      });
+      return;
+    }
 
     await fetchCategories();
 
@@ -69,9 +84,16 @@ export default function CategoriesTree() {
   };
 
   const deleteCategoryHandler = async (id: number, name: string) => {
-    await fetch(`/api/category/${id}`, {
+    const resp: Response = await fetch(`/api/category/${id}`, {
       method: "DELETE",
     });
+
+    if (resp.status == 500) {
+      toast("Error deleting category", {
+        description: "An error occurred while deleting the category",
+      });
+      return;
+    }
 
     await fetchCategories();
 
@@ -83,10 +105,17 @@ export default function CategoriesTree() {
   const editCategoryHandler = async (id: number, name: string) => {
     const reqBody: EditCategoryRequest = { name: name };
 
-    await fetch(`/api/category/${id}`, {
+    const resp: Response = await fetch(`/api/category/${id}`, {
       method: "PUT",
       body: JSON.stringify(reqBody),
     });
+
+    if (resp.status == 500) {
+      toast("Error modifying category", {
+        description: "An error occurred while modifying the category",
+      });
+      return;
+    }
 
     await fetchCategories();
 
@@ -106,10 +135,17 @@ export default function CategoriesTree() {
 
     console.log(reqBody);
 
-    await fetch("/api/category", {
+    const resp: Response = await fetch("/api/category", {
       method: "PUT",
       body: JSON.stringify(reqBody),
     });
+
+    if (resp.status == 500) {
+      toast("Error moving category", {
+        description: "An error occurred while moving the category",
+      });
+      return;
+    }
 
     await fetchCategories();
 
@@ -182,7 +218,7 @@ export default function CategoriesTree() {
         {/* Categories Tree Card */}
         <div className="bg-card p-4 rounded-md shadow-sm border h-[600px]">
           <>
-            {state.response.length === 0 ? (
+            {state.response.length == 0 || state.error ? (
               <p className="text-center text-muted-foreground py-6">
                 No categories available. Start by creating one!
               </p>
