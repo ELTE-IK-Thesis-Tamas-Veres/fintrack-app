@@ -3,8 +3,9 @@
 import { ThemeProvider } from "next-themes";
 import Navbar from "./Navbar";
 import { useEffect, useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
-export default function ThemeWrapper({
+export default function PageWrapper({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -31,6 +32,12 @@ export default function ThemeWrapper({
         <main className="container mx-auto p-4 bg-background border-t">
           {children}
         </main>
+        <footer className="bg-white border-t py-4">
+          <div className="container mx-auto text-center text-gray-500">
+            © {new Date().getFullYear()} FinTrack. All rights reserved.
+          </div>
+        </footer>
+        <Toaster />
       </ThemeProvider>
     </div>
   );
