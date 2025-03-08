@@ -32,7 +32,7 @@ export default function PageWrapper({
         <main className="container mx-auto p-4 bg-background border-t">
           {children}
         </main>
-        <footer className="bg-white border-t py-4">
+        <footer className="border-t py-4">
           <div className="container mx-auto text-center text-gray-500">
             © {new Date().getFullYear()} FinTrack. All rights reserved.
           </div>
