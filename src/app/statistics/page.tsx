@@ -38,6 +38,7 @@ import { MonthlyIncomeExpense } from "../api/statistics/lastYearMonthly/route";
 import { format } from "date-fns";
 import { GetCategoryResponse } from "../api/category/route";
 import { MonthlyCategoryStatistics } from "../api/statistics/lastYearCategoryMonthly/route";
+import { calculateMaxNodesAtSameDistance } from "@/lib/utils";
 
 const chartConfig = {
   expense: {
@@ -49,6 +50,42 @@ const chartConfig = {
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
+
+const SankeyLink = (props) => {
+  const {
+    sourceX,
+    targetX,
+    sourceY,
+    targetY,
+    sourceControlX,
+    targetControlX,
+    linkWidth,
+    index,
+  } = props;
+  const [fill, setFill] = useState("url(#linkGradient)");
+
+  return (
+    <Layer key={`CustomLink${index}`}>
+      <path
+        d={`
+          M${sourceX},${sourceY + linkWidth / 2}
+          C${sourceControlX},${sourceY + linkWidth / 2}
+            ${targetControlX},${targetY + linkWidth / 2}
+            ${targetX},${targetY + linkWidth / 2}
+          L${targetX},${targetY - linkWidth / 2}
+          C${targetControlX},${targetY - linkWidth / 2}
+            ${sourceControlX},${sourceY - linkWidth / 2}
+            ${sourceX},${sourceY - linkWidth / 2}
+          Z
+        `}
+        fill={fill}
+        strokeWidth="0"
+        onMouseEnter={() => setFill("rgba(0, 136, 254, 0.5)")}
+        onMouseLeave={() => setFill("url(#linkGradient)")}
+      />
+    </Layer>
+  );
+};
 
 const SankeyNode = ({
   x,
@@ -108,6 +145,10 @@ export default function Page() {
     response: undefined,
     error: undefined,
   });
+
+  const sankeyHeight = sankeyDataState.response
+    ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
+    : 0;
 
   const [monthlyDataState, setMonthlyDataState] = useState<{
     isLoading: boolean;
@@ -420,7 +461,10 @@ export default function Page() {
       </Card>
 
       {/* Sankey Diagram */}
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[1000px] h-[80vh]">
+      <Card
+        className="p-6 border rounded-lg shadow-lg bg-card h-[80vh]"
+        style={{ minHeight: `${sankeyHeight * 50 + 200}px` }}
+      >
         {sankeyDataState.isLoading && (
           <div className="h-[500px] flex items-center justify-center">
             <Skeleton className="w-full h-full rounded-lg" />
@@ -445,12 +489,13 @@ export default function Page() {
                   height={height}
                   data={sankeyDataState.response!}
                   node={<SankeyNode containerWidth={960} />}
-                  nodeWidth={10}
+                  nodeWidth={15}
                   nodePadding={30}
-                  linkCurvature={0.6}
+                  linkCurvature={0.5}
                   iterations={64}
+                  link={<SankeyLink />}
                   margin={{ left: 100, right: 200, top: 100, bottom: 100 }}
-                  sort={true}
+                  sort={false}
                 >
                   <defs>
                     <linearGradient id="linkGradient">
@@ -539,7 +584,7 @@ export default function Page() {
         <div className="mb-4">
           <Select onValueChange={(value) => setSelectedCategoryId(value)}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Year" />
+              <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>

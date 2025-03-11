@@ -53,6 +53,10 @@ export const GetRecordsDataTableColumns = (
           {(row.getValue("category") as GetCategoryResponse)?.name ?? "---"}
         </div>
       ),
+      filterFn: (rows, id, filterValue) => {
+        const category = rows.getValue("category") as GetCategoryResponse;
+        return category.name.toLowerCase().includes(filterValue.toLowerCase());
+      },
     },
     {
       accessorKey: "date",
