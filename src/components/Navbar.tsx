@@ -18,6 +18,7 @@ const navItems = [
   { label: "Records", href: "/records" },
   { label: "Statistics", href: "/statistics" },
   { label: "TOKEN", href: "/token" },
+  { label: "Import", href: "/import" },
 ];
 
 const Navbar = () => {

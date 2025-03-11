@@ -40,12 +40,12 @@ import { GetCategoryResponse } from "../api/category/route";
 import { MonthlyCategoryStatistics } from "../api/statistics/lastYearCategoryMonthly/route";
 
 const chartConfig = {
-  income: {
-    label: "Income",
-    color: "hsl(var(--chart-1))",
-  },
   expense: {
     label: "Expense",
+    color: "hsl(var(--chart-1))",
+  },
+  income: {
+    label: "Income",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -119,6 +119,23 @@ export default function Page() {
     error: undefined,
   });
 
+  let averageDiff = 0;
+
+  if (
+    monthlyDataState.response == undefined ||
+    monthlyDataState.response.length === 0
+  ) {
+    console.log("No data available to calculate the average difference.");
+  } else {
+    const totalDiff = monthlyDataState.response.reduce((acc, curr) => {
+      return acc + (curr.income - curr.expense);
+    }, 0);
+
+    averageDiff = totalDiff / monthlyDataState.response.length;
+
+    console.log(`Average income-expense difference is ${averageDiff} forints`);
+  }
+
   const [categoriesState, setCategoriesState] = useState<{
     isLoading: boolean;
     response: GetCategoryResponse[];
@@ -138,8 +155,6 @@ export default function Page() {
     response: [],
     error: undefined,
   });
-
-  console.log(monthlyCategoryState);
 
   const fetchCategories = async () => {
     setCategoriesState((previous) => ({ ...previous, isLoading: true }));
@@ -348,7 +363,7 @@ export default function Page() {
 
   return (
     <div className="p-6 space-y-6">
-      <Card className="p-6 border rounded-lg shadow-sm bg-card">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card">
         <h1 className="text-2xl font-semibold">Sankey Diagram</h1>
 
         {/* Filters */}
@@ -405,7 +420,7 @@ export default function Page() {
       </Card>
 
       {/* Sankey Diagram */}
-      <Card className="p-6 border rounded-lg shadow-sm bg-card min-h-[600px] h-[80vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[1000px] h-[80vh]">
         {sankeyDataState.isLoading && (
           <div className="h-[500px] flex items-center justify-center">
             <Skeleton className="w-full h-full rounded-lg" />
@@ -424,17 +439,18 @@ export default function Page() {
           sankeyDataState.response &&
           sankeyDataState.response.nodes.length > 0 && (
             <AutoSizer>
-              {({ width }) => (
+              {({ width, height }) => (
                 <Sankey
                   width={width}
-                  height={500}
+                  height={height}
                   data={sankeyDataState.response!}
                   node={<SankeyNode containerWidth={960} />}
                   nodeWidth={10}
-                  nodePadding={60}
-                  linkCurvature={0.61}
+                  nodePadding={30}
+                  linkCurvature={0.6}
                   iterations={64}
-                  margin={{ left: 200, right: 200, top: 100, bottom: 100 }}
+                  margin={{ left: 100, right: 200, top: 100, bottom: 100 }}
+                  sort={true}
                 >
                   <defs>
                     <linearGradient id="linkGradient">
@@ -451,9 +467,11 @@ export default function Page() {
 
       {/* Monthly Summary */}
 
-      <Card className="p-6 border rounded-lg shadow-sm bg-card min-h-[600px] h-[80vh]">
-        <CardHeader>
-          <CardTitle>Incomes and expenses monthly summary</CardTitle>
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[80vh]">
+        <CardHeader className="mb-4">
+          <CardTitle className="text-xl font-bold">
+            Incomes and expenses monthly summary
+          </CardTitle>
           <CardDescription>{getTimePeriodDescription()}</CardDescription>
         </CardHeader>
         {monthlyDataState.isLoading && (
@@ -489,92 +507,99 @@ export default function Page() {
                     cursor={false}
                     content={<ChartTooltipContent indicator="dashed" />}
                   />
-                  <Bar dataKey="income" fill="var(--color-income)" radius={4} />
                   <Bar
                     dataKey="expense"
                     fill="var(--color-expense)"
                     radius={4}
                   />
+                  <Bar dataKey="income" fill="var(--color-income)" radius={4} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
           )}
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <div className="flex gap-2 font-medium leading-none">
+            Average income-expense difference is{" "}
+            {Math.round(averageDiff).toLocaleString("hu-HU")} HUF
+            <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Showing data for the last 12 months
+          </div>
+        </CardFooter>
       </Card>
-      <Card className="p-6 border rounded-lg shadow-sm bg-card min-h-[600px] h-[80vh]">
-        <CardHeader>
-          <CardTitle>Bar Chart - Negative</CardTitle>
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[80vh]">
+        <CardHeader className="mb-4">
+          <CardTitle className="text-xl font-bold">
+            Selected category - Monthly summary
+          </CardTitle>
           <CardDescription>{getTimePeriodDescription()}</CardDescription>
         </CardHeader>
-        <Select onValueChange={(value) => setSelectedCategoryId(value)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select Year" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Select category</SelectLabel>
-              {categoriesState.response.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+
+        <div className="mb-4">
+          <Select onValueChange={(value) => setSelectedCategoryId(value)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Select category</SelectLabel>
+                {categoriesState.response.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
         <CardContent>
-          {monthlyCategoryState.isLoading && <p>Loading...</p>}
-          {!monthlyCategoryState.isLoading &&
-            selectedCategoryId &&
-            monthlyCategoryState.response.length === 0 && (
-              <p>No data available</p>
-            )}
-          {!selectedCategoryId && <p>Select a category to view data</p>}
-          {!monthlyCategoryState.isLoading &&
-            monthlyCategoryState.response.length > 0 && (
-              <ChartContainer config={chartConfig2}>
-                <BarChart
-                  accessibilityLayer
-                  data={monthlyCategoryState.response}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                  />
-                  <CartesianGrid vertical={false} />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel hideIndicator />}
-                  />
-                  <Bar dataKey="amount">
-                    <LabelList
-                      position="top"
-                      dataKey="amount"
-                      fillOpacity={1}
+          {monthlyCategoryState.isLoading ? (
+            <p className="text-center text-muted">Loading...</p>
+          ) : !selectedCategoryId ? (
+            <p className="text-center">Select a category to view data</p>
+          ) : monthlyCategoryState.response.length === 0 ? (
+            <p className="text-center">No data available</p>
+          ) : (
+            <ChartContainer config={chartConfig2}>
+              <BarChart accessibilityLayer data={monthlyCategoryState.response}>
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <CartesianGrid vertical={false} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel hideIndicator />}
+                />
+                <Bar dataKey="amount">
+                  <LabelList position="top" dataKey="amount" fillOpacity={1} />
+                  {monthlyCategoryState.response.map((item) => (
+                    <Cell
+                      key={item.month}
+                      fill={
+                        item.amount > 0
+                          ? "hsl(var(--chart-2))"
+                          : "hsl(var(--chart-1))"
+                      }
                     />
-                    {monthlyCategoryState.response.map((item) => (
-                      <Cell
-                        key={item.month}
-                        fill={
-                          item.amount > 0
-                            ? "hsl(var(--chart-1))"
-                            : "hsl(var(--chart-2))"
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            )}
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          )}
         </CardContent>
+
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
             Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing total visitors for the last 6 months
+            Showing data for the last 12 months
           </div>
         </CardFooter>
       </Card>
