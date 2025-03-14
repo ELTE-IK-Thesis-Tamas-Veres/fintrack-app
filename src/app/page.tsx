@@ -18,11 +18,11 @@ const HomePage = () => {
   const chartConfig = {
     desktop: {
       label: "Desktop",
-      color: "#2563eb",
+      color: "hsl(var(--chart-5))",
     },
     mobile: {
       label: "Mobile",
-      color: "#60a5fa",
+      color: "hsl(var(--chart-2))",
     },
   } satisfies ChartConfig;
 
@@ -42,11 +42,11 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-background text-foreground min-h-screen">
       {/* Header / Navbar */}
-      <header className="bg-white shadow">
+      <header className="shadow">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <Link className="text-2xl font-bold text-gray-800" href="/">
+          <Link className="text-2xl font-bold text-gray-600" href="/">
             ExpenseTracker
           </Link>
           <Link href="/signup">
@@ -89,7 +89,7 @@ const HomePage = () => {
                     axisLine={false}
                     tickFormatter={(value) => value.slice(0, 3)}
                   />
-                  <Bar dataKey="desktop" />
+                  <Bar fill="var(--color-desktop)" dataKey="desktop" />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>

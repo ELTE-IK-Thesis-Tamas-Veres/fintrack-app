@@ -16,8 +16,9 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Categories", href: "/categories" },
   { label: "Records", href: "/records" },
-  { label: "FAQs", href: "#faqs" },
+  { label: "Statistics", href: "/statistics" },
   { label: "TOKEN", href: "/token" },
+  { label: "Import", href: "/import" },
 ];
 
 const Navbar = () => {
@@ -145,13 +146,13 @@ export function ModeToggle() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem asChild onClick={() => setTheme("light")}>
+          <DropdownMenuItem onClick={() => setTheme("light")}>
             Light
           </DropdownMenuItem>
-          <DropdownMenuItem asChild onClick={() => setTheme("dark")}>
+          <DropdownMenuItem onClick={() => setTheme("dark")}>
             Dark
           </DropdownMenuItem>
-          <DropdownMenuItem asChild onClick={() => setTheme("system")}>
+          <DropdownMenuItem onClick={() => setTheme("system")}>
             System
           </DropdownMenuItem>
         </DropdownMenuContent>

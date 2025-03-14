@@ -154,39 +154,6 @@ export default function CategoriesTree() {
     });
   };
 
-  // const data = [
-  //   { id: "1", name: "Unread" },
-  //   { id: "2", name: "Threads" },
-  //   {
-  //     id: "3",
-  //     name: "Chat Rooms",
-  //     children: [
-  //       { id: "c1", name: "General" },
-  //       { id: "c2", name: "Random" },
-  //       {
-  //         id: "c3",
-  //         name: "Open Source Projects",
-  //         children: [
-  //           { id: "g1", name: "Alice" },
-  //           { id: "g2", name: "Bob" },
-  //           { id: "g3", name: "Charlie" },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: "4",
-  //     name: "Direct Messages",
-  //     children: [
-  //       { id: "d1", name: "Alice" },
-  //       { id: "d2", name: "Bob" },
-  //       { id: "d3", name: "Charlie" },
-  //     ],
-  //   },
-  // ];
-
-  //const { isLoading, response, error } = state;
-
   return (
     <>
       <div className="max-w-6xl mx-auto p-6">
@@ -248,56 +215,6 @@ export default function CategoriesTree() {
           </>
         </div>
       </div>
-      {/* <div>
-        <button
-          className="btn btn-blue"
-          color="primary"
-          onClick={(e) => handle(e, fetchCategories)}
-          data-testid="external-action"
-        >
-          Ping API
-        </button>
-      </div> */}
-      {/*<div className="result-block-container">
-        {isLoading && <div className="loading">Loading...</div>}
-        {(error || response) && (
-          <div className="result-block" data-testid="external-result">
-            <h6 className="muted">Result</h6>
-            {error && <p>error</p>}
-            {response && <p>{response.length}</p>}
-          </div>
-        )}
-      </div>
-      <>
-        {user && (
-          <div>
-            <h2>Welcome {user.name}!</h2>
-            <p>{user.email}</p>
-          </div>
-        )}
-      </>*/}
-      {/* <CreateCategoryDialog
-        isOpen={isAddCategoryDialogOpen}
-        setIsOpen={setIsAddCategoryDialogOpen}
-        createCategoryHandler={createCategoryHandler}
-      />
-      <Tree<Category>
-        data={state.response}
-        onMove={({ dragIds, parentId }) =>
-          moveCategoryHandler(dragIds, parentId)
-        }
-        rowHeight={30}
-        height={800}
-        width={600}
-      >
-        {(nodeProps) => (
-          <CategoryNode
-            {...nodeProps}
-            deleteCategoryHandler={deleteCategoryHandler}
-            editCategoryHandler={editCategoryHandler}
-          />
-        )}
-      </Tree> */}
     </>
   );
 }
