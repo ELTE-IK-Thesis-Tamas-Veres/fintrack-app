@@ -7,15 +7,16 @@ export interface EditCategoryRequest {
 
 export const PUT = async (
   req: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) => {
   try {
+    const { categoryId } = await params;
     const body: EditCategoryRequest = await req.json();
-    console.log("Updating Category:", params.categoryId, "with data:", body);
+    console.log("Updating Category:", categoryId, "with data:", body);
 
     const resp = await callFinTrackServices(
       req,
-      `category/${params.categoryId}`,
+      `category/${categoryId}`,
       "PUT",
       body
     );
@@ -36,14 +37,15 @@ export const PUT = async (
 
 export const DELETE = async (
   req: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) => {
   try {
-    console.log("Deleting Category:", params.categoryId);
+    const { categoryId } = await params;
+    console.log("Deleting Category:", categoryId);
 
     const resp = await callFinTrackServices(
       req,
-      `category/${params.categoryId}`,
+      `category/${categoryId}`,
       "DELETE"
     );
 
