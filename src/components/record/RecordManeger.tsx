@@ -225,8 +225,6 @@ export default function RecordManager() {
     },
   });
 
-  console.log("record to edit", recordToEdit);
-
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* 📌 Header Section */}
@@ -252,43 +250,54 @@ export default function RecordManager() {
           setIsSheetOpen={setIsEditRecordSheetOpen}
         />
       )}
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          placeholder="Filter descriptions..."
-          value={
-            (table.getColumn("description")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("description")?.setFilterValue(event.target.value)
-          }
-          className="max-w-md mr-2"
-        />
-        <div className="flex space-x-2">
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+        <div className="flex flex-wrap gap-2">
+          <Input
+            placeholder="Filter descriptions..."
+            value={
+              (table.getColumn("description")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn("description")?.setFilterValue(event.target.value)
+            }
+            className="max-w-md mr-2"
+          />
+          <Input
+            placeholder="Filter categories..."
+            value={
+              (table.getColumn("category")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn("category")?.setFilterValue(event.target.value)
+            }
+            className="max-w-md mr-2"
+          />
+        </div>
+
+        <div className="flex gap-2">
           <CreateRecordSheet createRecordHandler={createRecordHandler} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns <ChevronDown />
+              <Button variant="outline" className="flex items-center gap-1">
+                <span>Columns</span> <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
