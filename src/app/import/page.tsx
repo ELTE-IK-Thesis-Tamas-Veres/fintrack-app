@@ -12,9 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: JSONValue }
+  | JSONValue[];
+
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
-  const [jsonData, setJsonData] = useState<any>(null);
+  const [jsonData, setJsonData] = useState<JSONValue>(null);
   const [loading, setLoading] = useState(false);
 
   // Handle File Selection
@@ -83,7 +91,9 @@ export default function Page() {
 
           {jsonData && (
             <div className="p-3 border rounded-md bg-gray-100 dark:bg-gray-800 text-sm max-h-40 overflow-auto">
-              <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+              <pre>
+                <code>{JSON.stringify(jsonData, null, 2)}</code>
+              </pre>
             </div>
           )}
 
