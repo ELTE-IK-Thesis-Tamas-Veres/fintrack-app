@@ -9,9 +9,7 @@ services:
     container_name: fintrack-app
 
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: dockerfile
+    build: ./nginx
     container_name: nginx
     ports:
       - "80:80"
