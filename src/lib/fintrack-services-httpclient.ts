@@ -4,6 +4,8 @@ export async function callFinTrackServices<T>(
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: unknown
 ): Promise<T | null> {
+  const apiEndpoint = `https://localhost:5000/api/`;
+
   // ✅ Return `null` if no response body
   try {
     const headers: HeadersInit = {
@@ -19,11 +21,7 @@ export async function callFinTrackServices<T>(
       headers["Authorization"] = authHeader;
     }
 
-    console.log(
-      "➡️  API Request:",
-      method,
-      `https://localhost:7101/api/${endpoint}`
-    );
+    console.log("➡️  API Request:", method, `${apiEndpoint}${endpoint}`);
     console.log("📦 Request Body:", body);
 
     const requestOptions: RequestInit = {
@@ -32,10 +30,7 @@ export async function callFinTrackServices<T>(
       body: body ? JSON.stringify(body) : undefined,
     };
 
-    const response = await fetch(
-      `https://localhost:7101/api/${endpoint}`,
-      requestOptions
-    );
+    const response = await fetch(`${apiEndpoint}${endpoint}`, requestOptions);
 
     console.log("🔄 API Response:", response.status, response.statusText);
 
