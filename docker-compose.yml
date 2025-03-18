@@ -20,7 +20,12 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - fintrack-app
+    networks:
+      - fintrack-network
 
 networks:
   fintrack-network:
-    name: fintrack-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
