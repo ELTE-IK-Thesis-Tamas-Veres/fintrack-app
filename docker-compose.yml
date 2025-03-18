@@ -9,8 +9,7 @@ services:
       - .env
     image: fintrack-app:latest
     container_name: fintrack-app
-    networks:
-      - fintrack-network
+    network_mode: "host"
 
   nginx:
     build: ./nginx
@@ -22,9 +21,4 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - fintrack-app
-    networks:
-      - fintrack-network
-
-networks:
-  fintrack-network:
-    external: true
+    network_mode: "host"
