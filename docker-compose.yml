@@ -8,8 +8,6 @@ services:
     env_file:
       - .env
     image: fintrack-app:latest
-    networks:
-      - fintrack-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -23,9 +21,3 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - fintrack-app
-    networks:
-      - fintrack-network
-
-networks:
-  fintrack-network:
-    external: true
