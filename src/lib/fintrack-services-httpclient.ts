@@ -4,7 +4,7 @@ export async function callFinTrackServices<T>(
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: unknown
 ): Promise<T | null> {
-  const apiEndpoint = `http://host.docker.internal:5000/api/`;
+  const apiEndpoint = `host.docker.internal:5000/api/`;
 
   // ✅ Return `null` if no response body
   try {
