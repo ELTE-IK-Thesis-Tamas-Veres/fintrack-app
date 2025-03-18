@@ -9,7 +9,6 @@ services:
       - .env
     image: fintrack-app:latest
     container_name: fintrack-app
-    network_mode: "host"
 
   nginx:
     build: ./nginx
