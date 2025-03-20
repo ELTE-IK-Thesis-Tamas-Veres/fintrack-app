@@ -11,10 +11,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-// Using shadcn charts instead of react-chartjs-2 and chart.js
+import { useUser } from "@auth0/nextjs-auth0";
 
 const HomePage = () => {
-  // Sample data for the chart
+  const { user } = useUser();
+
   const chartConfig = {
     desktop: {
       label: "Desktop",
@@ -64,11 +65,19 @@ const HomePage = () => {
             Track your income and expenses effortlessly with our intuitive
             dashboard and insightful analytics.
           </p>
-          <Link href="/signup">
-            <Button variant="default" size="lg">
-              Get Started
-            </Button>
-          </Link>
+          {user ? (
+            <Link href="/categories">
+              <Button variant="default" size="lg">
+                Get Started
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/auth/login">
+              <Button variant="default" size="lg">
+                Get Started
+              </Button>
+            </Link>
+          )}
         </section>
 
         {/* Chart Section */}
@@ -123,12 +132,12 @@ const HomePage = () => {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Data Security</CardTitle>
+              <CardTitle>Import Data</CardTitle>
             </CardHeader>
             <CardContent>
               <p>
-                Your financial data is protected with top-tier security measures
-                and encryption.
+                Export you transactions from your bank and import them into
+                FinTrack to keep all your financial data in one place.
               </p>
             </CardContent>
           </Card>
