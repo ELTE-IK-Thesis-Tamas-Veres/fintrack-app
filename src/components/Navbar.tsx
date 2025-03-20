@@ -95,12 +95,6 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">Settings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/auth/logout">Log out</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

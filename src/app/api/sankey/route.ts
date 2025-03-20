@@ -7,7 +7,11 @@ export const GET = async (req: Request) => {
     const url = new URL(req.url);
     const queryParams = url.searchParams.toString();
 
-    const endpoint = `sankey?${queryParams}`;
+    let endpoint = `sankey`;
+
+    if (queryParams) {
+      endpoint += `?${queryParams}`;
+    }
 
     const resp: SankeyData[] | null = await callFinTrackServices<SankeyData[]>(
       req,

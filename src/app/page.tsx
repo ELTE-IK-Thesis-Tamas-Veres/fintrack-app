@@ -17,29 +17,29 @@ const HomePage = () => {
   const { user } = useUser();
 
   const chartConfig = {
-    desktop: {
-      label: "Desktop",
+    income: {
+      label: "Income",
       color: "hsl(var(--chart-5))",
     },
-    mobile: {
-      label: "Mobile",
+    expense: {
+      label: "Expense",
       color: "hsl(var(--chart-2))",
     },
   } satisfies ChartConfig;
 
   const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-    { month: "July", desktop: 186, mobile: 80 },
-    { month: "August", desktop: 305, mobile: 200 },
-    { month: "September", desktop: 237, mobile: 120 },
-    { month: "October", desktop: 73, mobile: 190 },
-    { month: "November", desktop: 209, mobile: 130 },
-    { month: "December", desktop: 214, mobile: 140 },
+    { month: "January", income: 186, expense: 80 },
+    { month: "February", income: 305, expense: 200 },
+    { month: "March", income: 237, expense: 120 },
+    { month: "April", income: 73, expense: 190 },
+    { month: "May", income: 209, expense: 130 },
+    { month: "June", income: 214, expense: 140 },
+    { month: "July", income: 186, expense: 80 },
+    { month: "August", income: 305, expense: 200 },
+    { month: "September", income: 237, expense: 120 },
+    { month: "October", income: 73, expense: 190 },
+    { month: "November", income: 209, expense: 130 },
+    { month: "December", income: 214, expense: 140 },
   ];
 
   return (
@@ -48,9 +48,9 @@ const HomePage = () => {
       <header className="shadow">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link className="text-2xl font-bold text-gray-600" href="/">
-            ExpenseTracker
+            FinTrack expense tracker
           </Link>
-          <Link href="/signup">
+          <Link href="/login">
             <Button variant="default">Sign Up</Button>
           </Link>
         </div>
@@ -98,7 +98,8 @@ const HomePage = () => {
                     axisLine={false}
                     tickFormatter={(value) => value.slice(0, 3)}
                   />
-                  <Bar fill="var(--color-desktop)" dataKey="desktop" />
+                  <Bar fill="var(--color-income)" dataKey="income" />
+                  <Bar fill="var(--color-expense)" dataKey="expense" />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>
