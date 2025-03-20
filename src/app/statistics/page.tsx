@@ -500,12 +500,12 @@ export default function Page() {
           )}
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Average income-expense difference is{" "}
+            Average monthly balance:{" "}
             {Math.round(averageDiff).toLocaleString("hu-HU")} HUF
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing data for the last 12 months
+            Based on data from the past 12 months
           </div>
         </CardFooter>
       </Card>
@@ -590,12 +590,12 @@ export default function Page() {
 
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Average monthly value for the selected category:{" "}
+            Average monthly amount for selected category:{" "}
             {Math.round(averegeCategoryDiff).toLocaleString("hu-HU")} HUF
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing data for the last 12 months
+            Based on data from the past 12 months
           </div>
         </CardFooter>
       </Card>
