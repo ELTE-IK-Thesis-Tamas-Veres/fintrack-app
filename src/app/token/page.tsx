@@ -10,7 +10,6 @@ export default function Home() {
   const fetchToken = async () => {
     const res = await fetch("/api/auth");
     const json = await res.json();
-    console.log(json);
     setToken(json.token);
   };
 

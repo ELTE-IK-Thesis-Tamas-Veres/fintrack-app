@@ -45,10 +45,10 @@ export function EditRecordSheet({
   isSheetOpen: boolean;
   setIsSheetOpen: (isOpen: boolean) => void;
 }) {
-  console.log(original);
   const [description, setDescription] = React.useState<string>(
     original.description
   );
+
   const [amount, setAmount] = React.useState<number>(original.amount);
   const [date, setDate] = React.useState<Date>(new Date(original.date));
   const [selectedCategory, setSelectedCategory] =
@@ -71,8 +71,6 @@ export function EditRecordSheet({
       date: formattedDate,
       description: description,
     };
-
-    console.log(body);
 
     await editRecordHandler(body);
   };

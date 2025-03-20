@@ -10,7 +10,6 @@ export const PUT = async (
     const { recordId } = await params;
 
     const body: EditRecordRequest = await req.json();
-    console.log("Updating Category:", recordId, "with data:", body);
 
     const resp = await callFinTrackServices(
       req,
@@ -25,7 +24,6 @@ export const PUT = async (
 
     return NextResponse.json(resp, { status: 200 });
   } catch (error: unknown) {
-    console.error("❌ API Update Failed:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }
@@ -40,8 +38,6 @@ export const DELETE = async (
   const { recordId } = await params;
 
   try {
-    console.log("Deleting Category:", recordId);
-
     const resp = await callFinTrackServices(
       req,
       `record/${recordId}`,
@@ -57,7 +53,6 @@ export const DELETE = async (
       { status: 200 }
     );
   } catch (error: unknown) {
-    console.error("❌ API Delete Failed:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }

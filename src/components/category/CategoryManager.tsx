@@ -24,8 +24,6 @@ export default function CategoriesTree() {
     error: undefined,
   });
 
-  console.log(state);
-
   const fetchCategories = async () => {
     setState((previous) => ({ ...previous, isLoading: true }));
 
@@ -132,8 +130,6 @@ export default function CategoriesTree() {
       categoryIds: dragIds.map((id) => parseInt(id)),
       parentId: parentId ? parseInt(parentId) : null,
     };
-
-    console.log(reqBody);
 
     const resp: Response = await fetch("/api/category", {
       method: "PUT",

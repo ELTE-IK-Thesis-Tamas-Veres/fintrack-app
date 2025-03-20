@@ -99,8 +99,6 @@ export default function RecordManager() {
   const createRecordHandler = async (request: CreateRecordRequest) => {
     const body: CreateRecordRequest = request;
 
-    console.log(body);
-
     try {
       const response = await fetch("/api/record", {
         method: "POST",
@@ -130,8 +128,6 @@ export default function RecordManager() {
 
   const editRecordHandler = async (request: EditRecordRequest) => {
     const body: EditRecordRequest = request;
-
-    console.log(body);
 
     try {
       const response = await fetch(`/api/record/${recordToEdit?.id}`, {
@@ -185,7 +181,6 @@ export default function RecordManager() {
   };
 
   React.useEffect(() => {
-    console.log("fetching records");
     fetchRecords();
   }, []);
 

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Cell, LabelList, Sankey, Tooltip } from "recharts";
+import { Cell, LabelList, Sankey, Tooltip, YAxis } from "recharts";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,18 +68,14 @@ export default function Page() {
   let averageDiff = 0;
 
   if (
-    monthlyDataState.response == undefined ||
-    monthlyDataState.response.length === 0
+    monthlyDataState.response != undefined &&
+    monthlyDataState.response.length > 0
   ) {
-    console.log("No data available to calculate the average difference.");
-  } else {
     const totalDiff = monthlyDataState.response.reduce((acc, curr) => {
       return acc + (curr.income - curr.expense);
     }, 0);
 
     averageDiff = totalDiff / monthlyDataState.response.length;
-
-    console.log(`Average income-expense difference is ${averageDiff} forints`);
   }
 
   const [categoriesState, setCategoriesState] = useState<{
@@ -101,6 +97,22 @@ export default function Page() {
     response: [],
     error: undefined,
   });
+
+  let averegeCategoryDiff = 0;
+  if (
+    monthlyCategoryState.response != undefined &&
+    monthlyCategoryState.response.length > 0
+  ) {
+    const totalCategoryDiff = monthlyCategoryState.response.reduce(
+      (acc, curr) => {
+        return acc + curr.amount;
+      },
+      0
+    );
+
+    averegeCategoryDiff =
+      totalCategoryDiff / monthlyCategoryState.response.length;
+  }
 
   const sankeyHeight = sankeyDataState.response
     ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
@@ -423,7 +435,7 @@ export default function Page() {
 
       {/* Monthly Summary */}
 
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[80vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[70vh]">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Incomes and expenses monthly summary
@@ -459,6 +471,19 @@ export default function Page() {
                     axisLine={false}
                     tickFormatter={(value) => value.slice(0, 3)}
                   />
+                  <YAxis
+                    tickLine={true}
+                    tickMargin={5}
+                    axisLine={false}
+                    tickFormatter={(value) => {
+                      return value.toLocaleString("hu-HU", {
+                        style: "currency",
+                        currency: "HUF",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      });
+                    }}
+                  />
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent indicator="dashed" />}
@@ -484,7 +509,7 @@ export default function Page() {
           </div>
         </CardFooter>
       </Card>
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[80vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[70vh]">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Selected category - Monthly summary
@@ -527,6 +552,19 @@ export default function Page() {
                   axisLine={false}
                   tickFormatter={(value) => value.slice(0, 3)}
                 />
+                <YAxis
+                  tickLine={true}
+                  tickMargin={5}
+                  axisLine={false}
+                  tickFormatter={(value) => {
+                    return value.toLocaleString("hu-HU", {
+                      style: "currency",
+                      currency: "HUF",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    });
+                  }}
+                />
                 <CartesianGrid vertical={false} />
                 <ChartTooltip
                   cursor={false}
@@ -552,7 +590,9 @@ export default function Page() {
 
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+            Average monthly value for the selected category:{" "}
+            {Math.round(averegeCategoryDiff).toLocaleString("hu-HU")} HUF
+            <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
             Showing data for the last 12 months

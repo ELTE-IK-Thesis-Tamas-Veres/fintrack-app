@@ -18,8 +18,6 @@ export const POST = async (req: NextRequest) => {
 
     const resp = await callFinTrackServices(req, "import", "POST", body);
 
-    console.log("API Response:", resp);
-
     if (!resp) {
       return new NextResponse(null, { status: 204 });
     }

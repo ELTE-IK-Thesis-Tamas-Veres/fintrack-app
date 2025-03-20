@@ -127,7 +127,6 @@ export const GetRecordsDataTableColumns = (
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  console.log("record set: ", row.original);
                   setRecordToEdit(row.original);
                   setIsEditRecordSheetOpen(true);
                 }}

@@ -10,7 +10,6 @@ export const GET = async (req: Request) => {
 
     return NextResponse.json(resp);
   } catch (error: unknown) {
-    console.error("API Request Failed:", error);
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }
@@ -21,11 +20,8 @@ export const GET = async (req: Request) => {
 export const POST = async (req: Request) => {
   try {
     const body = await req.json();
-    console.log("Received Body:", body);
 
     const resp = await callFinTrackServices(req, "record", "POST", body);
-
-    console.log("API Response:", resp);
 
     if (!resp) {
       return new NextResponse(null, { status: 204 });
@@ -33,8 +29,6 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json(resp, { status: 200 });
   } catch (error: unknown) {
-    console.error("❌ API Request Failed:", error);
-
     return NextResponse.json(
       { error: (error as Error).message || "Unknown error occurred" },
       { status: 500 }
