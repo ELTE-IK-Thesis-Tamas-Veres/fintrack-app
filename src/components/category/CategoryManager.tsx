@@ -14,45 +14,19 @@ import {
   EditCategoryRequest,
   EditCategoriesParentRequest,
 } from "@/types/DTO/Category";
+import { fetchAndHandle, FetchState } from "@/lib/utils";
 
 export default function CategoriesTree() {
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<FetchState<Category[]>>({
     isLoading: false,
     response: [],
     error: undefined,
   });
 
   const fetchCategories = async () => {
-    setState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/category/tree");
-      const data = await response.json();
-
-      if (data.error) {
-        setState((previous) => ({
-          ...previous,
-          response: [],
-          error: data.error,
-        }));
-      } else {
-        setState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setState((previous) => ({
-        ...previous,
-        response: [],
-        error: undefined,
-      }));
-    } finally {
-      setState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<Category[]>("/api/category/tree", setState, []);
   };
 
   useEffect(() => {
@@ -181,7 +155,7 @@ export default function CategoriesTree() {
         {/* Categories Tree Card */}
         <div className="bg-card p-4 rounded-md shadow-sm border h-[600px]">
           <>
-            {state.response.length == 0 || state.error ? (
+            {(state.response && state.response.length == 0) || state.error ? (
               <p className="text-center text-muted-foreground py-6">
                 No categories available. Start by creating one!
               </p>

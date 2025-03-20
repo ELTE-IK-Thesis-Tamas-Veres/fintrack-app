@@ -10,10 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { Cell, LabelList, Sankey, Tooltip, YAxis } from "recharts";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,7 +33,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { format } from "date-fns";
-import { calculateMaxNodesAtSameDistance } from "@/lib/utils";
+import {
+  calculateMaxNodesAtSameDistance,
+  fetchAndHandle,
+  FetchState,
+} from "@/lib/utils";
 import { SankeyLink } from "@/components/statistics/SankeyLink";
 import { SankeyNode } from "@/components/statistics/SankeyNode";
 import { SankeyData } from "@/types/DTO/Sankey";
@@ -45,227 +48,68 @@ import {
 import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export default function Page() {
-  const [sankeyDataState, setSankeyDataState] = useState<{
-    isLoading: boolean;
-    response?: SankeyData;
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: undefined,
-    error: undefined,
-  });
-
-  const [monthlyDataState, setMonthlyDataState] = useState<{
-    isLoading: boolean;
-    response?: MonthlyIncomeExpense[];
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: undefined,
-    error: undefined,
-  });
-
-  let averageDiff = 0;
-
-  if (
-    monthlyDataState.response != undefined &&
-    monthlyDataState.response.length > 0
-  ) {
-    const totalDiff = monthlyDataState.response.reduce((acc, curr) => {
-      return acc + (curr.income - curr.expense);
-    }, 0);
-
-    averageDiff = totalDiff / monthlyDataState.response.length;
-  }
-
-  const [categoriesState, setCategoriesState] = useState<{
-    isLoading: boolean;
-    response: GetCategoryResponse[];
-    error: unknown;
-  }>({
+  const [categoriesState, setCategoriesState] = useState<
+    FetchState<GetCategoryResponse[]>
+  >({
     isLoading: false,
     response: [],
     error: undefined,
   });
-
-  const [monthlyCategoryState, setMonthlyCategoryState] = useState<{
-    isLoading: boolean;
-    response: MonthlyCategoryStatistics[];
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: [],
-    error: undefined,
-  });
-
-  let averegeCategoryDiff = 0;
-  if (
-    monthlyCategoryState.response != undefined &&
-    monthlyCategoryState.response.length > 0
-  ) {
-    const totalCategoryDiff = monthlyCategoryState.response.reduce(
-      (acc, curr) => {
-        return acc + curr.amount;
-      },
-      0
-    );
-
-    averegeCategoryDiff =
-      totalCategoryDiff / monthlyCategoryState.response.length;
-  }
-
-  const sankeyHeight = sankeyDataState.response
-    ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
-    : 0;
 
   const fetchCategories = async () => {
-    setCategoriesState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/category");
-      const data = await response.json();
-
-      if (data.error) {
-        setCategoriesState((previous) => ({
-          ...previous,
-          response: [],
-          error: data.error,
-        }));
-      } else {
-        setCategoriesState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setCategoriesState((previous) => ({
-        ...previous,
-        response: [],
-        error: undefined,
-      }));
-    } finally {
-      setCategoriesState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<GetCategoryResponse[]>(
+      "/api/category",
+      setCategoriesState,
+      []
+    );
   };
+
+  const [monthlyCategoryState, setMonthlyCategoryState] = useState<
+    FetchState<MonthlyCategoryStatistics[]>
+  >({
+    isLoading: false,
+    response: [],
+    error: undefined,
+  });
 
   const fetchLastYearCategoriesMonthly = async (queryString: string) => {
-    setMonthlyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch(
-        "/api/statistics/lastYearCategoryMonthly/?" + queryString
-      );
-      const data = await response.json();
-
-      if (data.error) {
-        setMonthlyCategoryState((previous) => ({
-          ...previous,
-          response: [],
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setMonthlyCategoryState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setMonthlyCategoryState((previous) => ({
-        ...previous,
-        response: [],
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setMonthlyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<MonthlyCategoryStatistics[]>(
+      "/api/statistics/lastYearCategoryMonthly" + queryString,
+      setMonthlyCategoryState,
+      []
+    );
   };
+
+  const [monthlyDataState, setMonthlyDataState] = useState<
+    FetchState<MonthlyIncomeExpense[]>
+  >({
+    isLoading: false,
+    response: [],
+    error: undefined,
+  });
 
   const fetchMonthlyStatistics = async () => {
-    setMonthlyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/statistics/lastYearMonthly");
-      const data = await response.json();
-
-      if (data.error) {
-        setMonthlyDataState((previous) => ({
-          ...previous,
-          response: undefined,
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setMonthlyDataState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setMonthlyDataState((previous) => ({
-        ...previous,
-        response: undefined,
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setMonthlyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<MonthlyIncomeExpense[]>(
+      "/api/statistics/lastYearMonthly",
+      setMonthlyDataState,
+      []
+    );
   };
 
+  const [sankeyDataState, setSankeyDataState] = useState<
+    FetchState<SankeyData>
+  >({
+    isLoading: false,
+    response: undefined,
+    error: undefined,
+  });
+
   const fetchSankeyData = async (query: string) => {
-    setSankeyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/sankey?" + query);
-      const data = await response.json();
-
-      if (data.error) {
-        setSankeyDataState((previous) => ({
-          ...previous,
-          response: undefined,
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setSankeyDataState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setSankeyDataState((previous) => ({
-        ...previous,
-        response: undefined,
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setSankeyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<SankeyData>(
+      "/api/sankey" + query,
+      setSankeyDataState,
+      undefined
+    );
   };
 
   const [year, setYear] = useState("all");
@@ -279,15 +123,15 @@ export default function Page() {
     if (year === "all") {
       fetchSankeyData("");
     } else if (month === "all") {
-      fetchSankeyData(`year=${year}`);
+      fetchSankeyData(`?year=${year}`);
     } else {
-      fetchSankeyData(`year=${year}&month=${month}`);
+      fetchSankeyData(`?year=${year}&month=${month}`);
     }
   };
 
   useEffect(() => {
     if (selectedCategoryId) {
-      fetchLastYearCategoriesMonthly(`categoryId=${selectedCategoryId}`);
+      fetchLastYearCategoriesMonthly(`?categoryId=${selectedCategoryId}`);
     }
   }, [selectedCategoryId]);
 
@@ -322,6 +166,37 @@ export default function Page() {
       "MMMM yyyy"
     )}`;
   };
+
+  const averageDiff = useMemo(() => {
+    if (monthlyDataState.response && monthlyDataState.response.length > 0) {
+      const totalDiff = monthlyDataState.response.reduce(
+        (acc, curr) => acc + (curr.income - curr.expense),
+        0
+      );
+      return totalDiff / monthlyDataState.response.length;
+    }
+    return 0;
+  }, [monthlyDataState.response]);
+
+  const averegeCategoryDiff = useMemo(() => {
+    if (
+      monthlyCategoryState.response &&
+      monthlyCategoryState.response.length > 0
+    ) {
+      const totalCategoryDiff = monthlyCategoryState.response.reduce(
+        (acc, curr) => acc + curr.amount,
+        0
+      );
+      return totalCategoryDiff / monthlyCategoryState.response.length;
+    }
+    return 0;
+  }, [monthlyCategoryState.response]);
+
+  const sankeyHeight = useMemo(() => {
+    return sankeyDataState.response
+      ? calculateMaxNodesAtSameDistance(sankeyDataState.response)
+      : 0;
+  }, [sankeyDataState.response]);
 
   return (
     <div className="p-6 space-y-6">
@@ -525,11 +400,15 @@ export default function Page() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Select category</SelectLabel>
-                {categoriesState.response.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
+                {categoriesState.response &&
+                  categoriesState.response.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -540,7 +419,8 @@ export default function Page() {
             <p className="text-center text-muted">Loading...</p>
           ) : !selectedCategoryId ? (
             <p className="text-center">Select a category to view data</p>
-          ) : monthlyCategoryState.response.length === 0 ? (
+          ) : monthlyCategoryState.response === undefined ||
+            monthlyCategoryState.response.length === 0 ? (
             <p className="text-center">No data available</p>
           ) : (
             <ChartContainer config={chartConfig2}>
