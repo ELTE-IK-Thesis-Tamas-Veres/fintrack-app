@@ -51,17 +51,27 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const SankeyLink = (props) => {
-  const {
-    sourceX,
-    targetX,
-    sourceY,
-    targetY,
-    sourceControlX,
-    targetControlX,
-    linkWidth,
-    index,
-  } = props;
+interface SankeyLinkProps {
+  sourceX: number;
+  targetX: number;
+  sourceY: number;
+  targetY: number;
+  sourceControlX: number;
+  targetControlX: number;
+  linkWidth: number;
+  index: number;
+}
+
+const SankeyLink = ({
+  sourceX,
+  targetX,
+  sourceY,
+  targetY,
+  sourceControlX,
+  targetControlX,
+  linkWidth,
+  index,
+}: SankeyLinkProps) => {
   const [fill, setFill] = useState("url(#linkGradient)");
 
   return (
@@ -87,6 +97,19 @@ const SankeyLink = (props) => {
   );
 };
 
+interface SankeyNodeProps {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  index: number;
+  payload: {
+    name: string;
+    value: number;
+  };
+  containerWidth: number;
+}
+
 const SankeyNode = ({
   x,
   y,
@@ -95,7 +118,7 @@ const SankeyNode = ({
   index,
   payload,
   containerWidth,
-}: any) => {
+}: SankeyNodeProps) => {
   const isOut = x + width + 6 > containerWidth;
 
   return (
@@ -488,12 +511,14 @@ export default function Page() {
                   width={width}
                   height={height}
                   data={sankeyDataState.response!}
-                  node={<SankeyNode containerWidth={960} />}
+                  node={(nodeProps) => (
+                    <SankeyNode {...nodeProps} containerWidth={960} />
+                  )}
                   nodeWidth={15}
                   nodePadding={30}
                   linkCurvature={0.5}
                   iterations={64}
-                  link={<SankeyLink />}
+                  link={(linkProps) => <SankeyLink {...linkProps} />}
                   margin={{ left: 100, right: 200, top: 100, bottom: 100 }}
                   sort={false}
                 >
@@ -652,20 +677,6 @@ export default function Page() {
   );
 }
 
-const chartData = [
-  { month: "January", visitors: 186 },
-  { month: "February", visitors: 205 },
-  { month: "March", visitors: -207 },
-  { month: "April", visitors: 173 },
-  { month: "May", visitors: -209 },
-  { month: "June", visitors: 214 },
-  { month: "January", visitors: 186 },
-  { month: "February", visitors: 205 },
-  { month: "March", visitors: -207 },
-  { month: "April", visitors: 173 },
-  { month: "May", visitors: -209 },
-  { month: "June", visitors: 214 },
-];
 const chartConfig2 = {
   visitors: {
     label: "Visitors",

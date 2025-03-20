@@ -17,7 +17,7 @@ export const GET = async (req: Request) => {
       MonthlyCategoryStatistics[]
     >(req, endpoint, "GET");
 
-    console.log("API Response:", resp);
+    console.log("API Response length:", resp?.length);
 
     return NextResponse.json(resp);
   } catch (error: unknown) {
