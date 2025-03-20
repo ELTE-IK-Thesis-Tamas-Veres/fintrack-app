@@ -1,5 +1,5 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
-import { EditRecordRequest } from "@/types/Record";
+import { EditRecordRequest } from "@/types/DTO/Record";
 import { NextResponse } from "next/server";
 
 export const PUT = async (

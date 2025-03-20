@@ -30,9 +30,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
-import { GetCategoryResponse } from "@/app/api/category/route";
 
-import { EditRecordRequest, Record } from "@/types/Record";
+import { EditRecordRequest, Record } from "@/types/DTO/Record";
+import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export function EditRecordSheet({
   editRecordHandler,

@@ -1,14 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { GetRecordResponse } from "@/types/DTO/Record";
 import { NextResponse } from "next/server";
-import { GetCategoryResponse } from "../category/route";
-
-export interface GetRecordResponse {
-  id: number;
-  date: Date;
-  category?: GetCategoryResponse;
-  description: string;
-  amount: number;
-}
 
 export const GET = async (req: Request) => {
   try {
@@ -25,13 +17,6 @@ export const GET = async (req: Request) => {
     );
   }
 };
-
-export interface CreateRecordRequest {
-  date: string;
-  categoryId: number | null;
-  description: string;
-  amount: number;
-}
 
 export const POST = async (req: Request) => {
   try {

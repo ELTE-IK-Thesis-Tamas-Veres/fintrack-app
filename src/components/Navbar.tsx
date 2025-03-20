@@ -11,19 +11,21 @@ import { useTheme } from "next-themes";
 import { useUser } from "@auth0/nextjs-auth0";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import Image from "next/image";
 
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Categories", href: "/categories" },
   { label: "Records", href: "/records" },
   { label: "Statistics", href: "/statistics" },
-  { label: "TOKEN", href: "/token" },
+  //{ label: "TOKEN", href: "/token" },
   { label: "Import", href: "/import" },
 ];
 
 const Navbar = () => {
   const { user } = useUser();
   const pathname = usePathname();
+  const { theme } = useTheme();
 
   const isActive = (path: string) =>
     pathname === path ? "text-primary font-medium" : "";
@@ -35,10 +37,25 @@ const Navbar = () => {
     >
       <div className="flex items-center gap-4">
         {/* Brand / Logo */}
+        {theme === "dark" ? (
+          <Image
+            src="/images/logo-darkmode-cropped.png"
+            alt="FinTrack Logo"
+            width={40}
+            height={40}
+          />
+        ) : (
+          <Image
+            src="/images/logo-lightmode-cropped.png"
+            alt="FinTrack Logo"
+            width={40}
+            height={40}
+          />
+        )}
         <Link className="text-xl font-bold" href="/">
           FinTrack
         </Link>
-        <ul className="hidden md:flex items-center gap-10 text-card-foreground">
+        <ul className="hidden md:flex items-center gap-10 text-card-foreground ml-5">
           {navItems.map((item) => (
             <li key={item.href} className={isActive(item.href)}>
               <Link href={item.href}>{item.label}</Link>

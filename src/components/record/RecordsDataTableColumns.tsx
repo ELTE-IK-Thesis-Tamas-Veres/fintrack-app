@@ -13,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Record } from "@/types/Record";
-import { GetCategoryResponse } from "@/app/api/category/route";
+import { Record } from "@/types/DTO/Record";
+import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export const GetRecordsDataTableColumns = (
   setIsDeleteRecordDialogOpen: (isOpen: boolean) => void,

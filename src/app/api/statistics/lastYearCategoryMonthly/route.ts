@@ -1,10 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { MonthlyCategoryStatistics } from "@/types/DTO/Statistics";
 import { NextResponse } from "next/server";
-
-export interface MonthlyCategoryStatistics {
-  month: string;
-  amount: number;
-}
 
 export const GET = async (req: Request) => {
   try {

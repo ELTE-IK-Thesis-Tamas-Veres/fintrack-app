@@ -1,10 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { GetCategoryResponse } from "@/types/DTO/Category";
 import { NextResponse } from "next/server";
-
-export interface GetCategoryResponse {
-  id: number;
-  name: string;
-}
 
 export const GET = async (req: Request) => {
   try {
@@ -21,10 +17,6 @@ export const GET = async (req: Request) => {
     );
   }
 };
-
-export interface AddCategoryRequest {
-  name: string;
-}
 
 export const POST = async (req: Request) => {
   try {
@@ -53,11 +45,6 @@ export const POST = async (req: Request) => {
     );
   }
 };
-
-export interface EditCategoriesParentRequest {
-  categoryIds: number[];
-  parentId: number | null;
-}
 
 export const PUT = async (req: Request) => {
   try {

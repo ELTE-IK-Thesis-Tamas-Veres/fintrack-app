@@ -16,36 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { GetCategoryResponse } from "@/app/api/category/route";
 import { Label } from "../ui/label";
-/*
-type Status = {
-  value: string;
-  label: string;
-};
-
-const statuses: Status[] = [
-  {
-    value: "backlog",
-    label: "Backlog",
-  },
-  {
-    value: "todo",
-    label: "Todo",
-  },
-  {
-    value: "in progress",
-    label: "In Progress",
-  },
-  {
-    value: "done",
-    label: "Done",
-  },
-  {
-    value: "canceled",
-    label: "Canceled",
-  },
-];*/
+import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export function SelectCategoryComboBox({
   initiallySelectedCategoryId,

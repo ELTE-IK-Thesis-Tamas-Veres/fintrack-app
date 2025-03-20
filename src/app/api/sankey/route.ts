@@ -1,20 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { SankeyData } from "@/types/DTO/Sankey";
 import { NextResponse } from "next/server";
-
-export interface SankeyData {
-  nodes: SankeyNode[];
-  links: SankeyLink[];
-}
-
-export interface SankeyNode {
-  name: string;
-}
-
-export interface SankeyLink {
-  source: number;
-  target: number;
-  value: number;
-}
 
 export const GET = async (req: Request) => {
   try {

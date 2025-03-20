@@ -1,9 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { EditCategoryRequest } from "@/types/DTO/Category";
 import { NextResponse } from "next/server";
-
-export interface EditCategoryRequest {
-  name: string;
-}
 
 export const PUT = async (
   req: Request,

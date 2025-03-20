@@ -12,11 +12,10 @@ import {
 } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Cell, LabelList, Layer, Rectangle, Sankey, Tooltip } from "recharts";
+import { Cell, LabelList, Sankey, Tooltip } from "recharts";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SankeyData } from "../api/sankey/route";
 
 import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
@@ -34,129 +33,16 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { MonthlyIncomeExpense } from "../api/statistics/lastYearMonthly/route";
 import { format } from "date-fns";
-import { GetCategoryResponse } from "../api/category/route";
-import { MonthlyCategoryStatistics } from "../api/statistics/lastYearCategoryMonthly/route";
 import { calculateMaxNodesAtSameDistance } from "@/lib/utils";
-
-const chartConfig = {
-  expense: {
-    label: "Expense",
-    color: "hsl(var(--chart-1))",
-  },
-  income: {
-    label: "Income",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
-
-interface SankeyLinkProps {
-  sourceX: number;
-  targetX: number;
-  sourceY: number;
-  targetY: number;
-  sourceControlX: number;
-  targetControlX: number;
-  linkWidth: number;
-  index: number;
-}
-
-const SankeyLink = ({
-  sourceX,
-  targetX,
-  sourceY,
-  targetY,
-  sourceControlX,
-  targetControlX,
-  linkWidth,
-  index,
-}: SankeyLinkProps) => {
-  const [fill, setFill] = useState("url(#linkGradient)");
-
-  return (
-    <Layer key={`CustomLink${index}`}>
-      <path
-        d={`
-          M${sourceX},${sourceY + linkWidth / 2}
-          C${sourceControlX},${sourceY + linkWidth / 2}
-            ${targetControlX},${targetY + linkWidth / 2}
-            ${targetX},${targetY + linkWidth / 2}
-          L${targetX},${targetY - linkWidth / 2}
-          C${targetControlX},${targetY - linkWidth / 2}
-            ${sourceControlX},${sourceY - linkWidth / 2}
-            ${sourceX},${sourceY - linkWidth / 2}
-          Z
-        `}
-        fill={fill}
-        strokeWidth="0"
-        onMouseEnter={() => setFill("rgba(0, 136, 254, 0.5)")}
-        onMouseLeave={() => setFill("url(#linkGradient)")}
-      />
-    </Layer>
-  );
-};
-
-interface SankeyNodeProps {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  index: number;
-  payload: {
-    name: string;
-    value: number;
-  };
-  containerWidth: number;
-}
-
-const SankeyNode = ({
-  x,
-  y,
-  width,
-  height,
-  index,
-  payload,
-  containerWidth,
-}: SankeyNodeProps) => {
-  const isOut = x + width + 6 > containerWidth;
-
-  return (
-    <Layer key={`CustomNode${index}`}>
-      <Rectangle
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        className="fill-primary transition-color"
-      />
-      <text
-        textAnchor={isOut ? "end" : "start"}
-        x={isOut ? x - 6 : x + width + 6}
-        y={y + height / 2}
-        fontSize="14"
-        className="font-bold transition-colors fill-chart-2"
-      >
-        {payload.name}
-      </text>
-      <text
-        textAnchor={isOut ? "end" : "start"}
-        x={isOut ? x - 6 : x + width + 6}
-        y={y + height / 2 + 13}
-        fontSize="12"
-        className="fill-chart-3 dark:fill-white"
-        strokeOpacity="0.7"
-      >
-        {new Intl.NumberFormat("hu-HU", {
-          style: "currency",
-          currency: "HUF",
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(payload.value)}
-      </text>
-    </Layer>
-  );
-};
+import { SankeyLink } from "@/components/statistics/SankeyLink";
+import { SankeyNode } from "@/components/statistics/SankeyNode";
+import { SankeyData } from "@/types/DTO/Sankey";
+import {
+  MonthlyCategoryStatistics,
+  MonthlyIncomeExpense,
+} from "@/types/DTO/Statistics";
+import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export default function Page() {
   const [sankeyDataState, setSankeyDataState] = useState<{
@@ -168,10 +54,6 @@ export default function Page() {
     response: undefined,
     error: undefined,
   });
-
-  const sankeyHeight = sankeyDataState.response
-    ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
-    : 0;
 
   const [monthlyDataState, setMonthlyDataState] = useState<{
     isLoading: boolean;
@@ -219,6 +101,10 @@ export default function Page() {
     response: [],
     error: undefined,
   });
+
+  const sankeyHeight = sankeyDataState.response
+    ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
+    : 0;
 
   const fetchCategories = async () => {
     setCategoriesState((previous) => ({ ...previous, isLoading: true }));
@@ -676,6 +562,17 @@ export default function Page() {
     </div>
   );
 }
+
+const chartConfig = {
+  expense: {
+    label: "Expense",
+    color: "hsl(var(--chart-1))",
+  },
+  income: {
+    label: "Income",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;
 
 const chartConfig2 = {
   visitors: {

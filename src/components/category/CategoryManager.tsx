@@ -6,14 +6,14 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 import { toast } from "sonner";
 
-import {
-  AddCategoryRequest,
-  EditCategoriesParentRequest,
-} from "@/app/api/category/route";
-import { EditCategoryRequest } from "@/app/api/category/[categoryId]/route";
 import CategoryNode, { Category } from "./CategoryNode";
 import CreateCategoryDialog from "./CreateCategoryDialog";
 import { Button } from "../ui/button";
+import {
+  AddCategoryRequest,
+  EditCategoryRequest,
+  EditCategoriesParentRequest,
+} from "@/types/DTO/Category";
 
 export default function CategoriesTree() {
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);

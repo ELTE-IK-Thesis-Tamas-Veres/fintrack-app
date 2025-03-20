@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 
-import { Record } from "@/types/Record";
+import { Record } from "@/types/DTO/Record";
 
 export const DeleteRecordDialog = ({
   deleteRecordHandler,

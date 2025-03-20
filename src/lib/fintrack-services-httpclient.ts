@@ -4,7 +4,7 @@ export async function callFinTrackServices<T>(
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: unknown
 ): Promise<T | null> {
-  const apiEndpoint = `http://fintrack-api:5000/api/`;
+  const apiEndpoint = `${process.env.FINTRACK_API_URL}/api/`;
 
   // ✅ Return `null` if no response body
   try {

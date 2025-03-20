@@ -31,8 +31,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
-import { CreateRecordRequest } from "@/app/api/record/route";
-import { GetCategoryResponse } from "@/app/api/category/route";
+import { GetCategoryResponse } from "@/types/DTO/Category";
+import { CreateRecordRequest } from "@/types/DTO/Record";
 
 export function CreateRecordSheet({
   createRecordHandler,

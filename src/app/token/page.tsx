@@ -16,18 +16,10 @@ export default function Home() {
 
   return (
     <div>
-      <h1>My Homepage</h1>
-      <p>
-        <a href="/auth/login">Login</a>
-      </p>
-      <p>
-        <a href="/auth/logout">Logout</a>
-      </p>
       <Button className="my-3" onClick={() => fetchToken()}>
         Get token
       </Button>
       <Textarea value={token} rows={10} onChange={() => {}} />
-      <p className="text-lg text-red-500">This should be red</p>
     </div>
   );
 }

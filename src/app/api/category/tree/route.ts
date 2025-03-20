@@ -1,11 +1,6 @@
 import { callFinTrackServices } from "@/lib/fintrack-services-httpclient";
+import { GetCategoryTreeResponse } from "@/types/DTO/Category";
 import { NextResponse } from "next/server";
-
-export interface GetCategoryTreeResponse {
-  id: number;
-  name: string;
-  children: GetCategoryTreeResponse[];
-}
 
 export const GET = async (req: Request) => {
   try {
