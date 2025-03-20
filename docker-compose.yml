@@ -8,8 +8,10 @@ services:
     env_file:
       - .env
     image: fintrack-app:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    container_name: fintrack-app
+    networks:
+      - fintrack-network  # Connects to the fintrack-network
+
 
   nginx:
     build: ./nginx
@@ -21,3 +23,10 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - fintrack-app
+    networks:
+      - fintrack-network  # Connects to the fintrack-network
+
+networks:
+  fintrack-network:
+    external: true
+    name: fintrack-network
