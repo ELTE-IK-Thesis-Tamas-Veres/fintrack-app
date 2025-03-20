@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useUser } from "@auth0/nextjs-auth0";
 import { Tree } from "react-arborist";
+import Image from "next/image";
 
 export default function Content() {
   const { user } = useUser();
@@ -67,7 +68,10 @@ export default function Content() {
     }
   };
 
-  const handle = (event, fn) => {
+  const handle = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    fn: () => void
+  ) => {
     event.preventDefault();
     fn();
   };
@@ -101,7 +105,13 @@ export default function Content() {
           <div>
             <h2>Welcome {user.name}!</h2>
             <p>{user.email}</p>
-            <img src={user.picture} alt={user.name} width={50} height={50} />
+            <Image
+              src={user.picture || "/default-picture.png"}
+              alt={user.name || "User"}
+              width={50}
+              height={50}
+              priority
+            />
           </div>
         )}
       </>

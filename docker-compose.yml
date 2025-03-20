@@ -1,0 +1,32 @@
+#   docker network create fintrack-network --subnet=192.168.100.0/24
+
+services:
+  fintrack-app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    image: fintrack-app:latest
+    container_name: fintrack-app
+    networks:
+      - fintrack-network  # Connects to the fintrack-network
+
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - fintrack-app
+    networks:
+      - fintrack-network  # Connects to the fintrack-network
+
+networks:
+  fintrack-network:
+    external: true
+    name: fintrack-network

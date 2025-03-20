@@ -4,15 +4,17 @@ import { NextResponse } from "next/server";
 
 export const PUT = async (
   req: Request,
-  { params }: { params: { recordId: string } }
+  { params }: { params: Promise<{ recordId: string }> }
 ) => {
   try {
+    const { recordId } = await params;
+
     const body: EditRecordRequest = await req.json();
-    console.log("Updating Category:", params.recordId, "with data:", body);
+    console.log("Updating Category:", recordId, "with data:", body);
 
     const resp = await callFinTrackServices(
       req,
-      `record/${params.recordId}`,
+      `record/${recordId}`,
       "PUT",
       body
     );
@@ -33,14 +35,16 @@ export const PUT = async (
 
 export const DELETE = async (
   req: Request,
-  { params }: { params: { recordId: number } }
+  { params }: { params: Promise<{ recordId: number }> }
 ) => {
+  const { recordId } = await params;
+
   try {
-    console.log("Deleting Category:", params.recordId);
+    console.log("Deleting Category:", recordId);
 
     const resp = await callFinTrackServices(
       req,
-      `record/${params.recordId}`,
+      `record/${recordId}`,
       "DELETE"
     );
 
