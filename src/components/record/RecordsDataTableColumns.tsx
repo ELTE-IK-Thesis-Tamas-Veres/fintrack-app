@@ -55,7 +55,11 @@ export const GetRecordsDataTableColumns = (
       ),
       filterFn: (rows, id, filterValue) => {
         const category = rows.getValue("category") as GetCategoryResponse;
-        return category.name.toLowerCase().includes(filterValue.toLowerCase());
+
+        return (
+          category != undefined &&
+          category.name.toLowerCase().includes(filterValue.toLowerCase())
+        );
       },
     },
     {
