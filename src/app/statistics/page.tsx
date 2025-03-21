@@ -10,13 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { Cell, LabelList, Layer, Rectangle, Sankey, Tooltip } from "recharts";
-import { toast } from "sonner";
+import { Cell, LabelList, Sankey, Tooltip, YAxis } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SankeyData } from "../api/sankey/route";
 
 import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
@@ -34,340 +32,84 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { MonthlyIncomeExpense } from "../api/statistics/lastYearMonthly/route";
 import { format } from "date-fns";
-import { GetCategoryResponse } from "../api/category/route";
-import { MonthlyCategoryStatistics } from "../api/statistics/lastYearCategoryMonthly/route";
-import { calculateMaxNodesAtSameDistance } from "@/lib/utils";
-
-const chartConfig = {
-  expense: {
-    label: "Expense",
-    color: "hsl(var(--chart-1))",
-  },
-  income: {
-    label: "Income",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
-
-interface SankeyLinkProps {
-  sourceX: number;
-  targetX: number;
-  sourceY: number;
-  targetY: number;
-  sourceControlX: number;
-  targetControlX: number;
-  linkWidth: number;
-  index: number;
-}
-
-const SankeyLink = ({
-  sourceX,
-  targetX,
-  sourceY,
-  targetY,
-  sourceControlX,
-  targetControlX,
-  linkWidth,
-  index,
-}: SankeyLinkProps) => {
-  const [fill, setFill] = useState("url(#linkGradient)");
-
-  return (
-    <Layer key={`CustomLink${index}`}>
-      <path
-        d={`
-          M${sourceX},${sourceY + linkWidth / 2}
-          C${sourceControlX},${sourceY + linkWidth / 2}
-            ${targetControlX},${targetY + linkWidth / 2}
-            ${targetX},${targetY + linkWidth / 2}
-          L${targetX},${targetY - linkWidth / 2}
-          C${targetControlX},${targetY - linkWidth / 2}
-            ${sourceControlX},${sourceY - linkWidth / 2}
-            ${sourceX},${sourceY - linkWidth / 2}
-          Z
-        `}
-        fill={fill}
-        strokeWidth="0"
-        onMouseEnter={() => setFill("rgba(0, 136, 254, 0.5)")}
-        onMouseLeave={() => setFill("url(#linkGradient)")}
-      />
-    </Layer>
-  );
-};
-
-interface SankeyNodeProps {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  index: number;
-  payload: {
-    name: string;
-    value: number;
-  };
-  containerWidth: number;
-}
-
-const SankeyNode = ({
-  x,
-  y,
-  width,
-  height,
-  index,
-  payload,
-  containerWidth,
-}: SankeyNodeProps) => {
-  const isOut = x + width + 6 > containerWidth;
-
-  return (
-    <Layer key={`CustomNode${index}`}>
-      <Rectangle
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        className="fill-primary transition-color"
-      />
-      <text
-        textAnchor={isOut ? "end" : "start"}
-        x={isOut ? x - 6 : x + width + 6}
-        y={y + height / 2}
-        fontSize="14"
-        className="font-bold transition-colors fill-chart-2"
-      >
-        {payload.name}
-      </text>
-      <text
-        textAnchor={isOut ? "end" : "start"}
-        x={isOut ? x - 6 : x + width + 6}
-        y={y + height / 2 + 13}
-        fontSize="12"
-        className="fill-chart-3 dark:fill-white"
-        strokeOpacity="0.7"
-      >
-        {new Intl.NumberFormat("hu-HU", {
-          style: "currency",
-          currency: "HUF",
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(payload.value)}
-      </text>
-    </Layer>
-  );
-};
+import {
+  calculateMaxNodesAtSameDistance,
+  fetchAndHandle,
+  FetchState,
+} from "@/lib/utils";
+import { SankeyLink } from "@/components/statistics/SankeyLink";
+import { SankeyNode } from "@/components/statistics/SankeyNode";
+import { SankeyData } from "@/types/DTO/Sankey";
+import {
+  MonthlyCategoryStatistics,
+  MonthlyIncomeExpense,
+} from "@/types/DTO/Statistics";
+import { GetCategoryResponse } from "@/types/DTO/Category";
 
 export default function Page() {
-  const [sankeyDataState, setSankeyDataState] = useState<{
-    isLoading: boolean;
-    response?: SankeyData;
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: undefined,
-    error: undefined,
-  });
-
-  const sankeyHeight = sankeyDataState.response
-    ? calculateMaxNodesAtSameDistance(sankeyDataState.response!)
-    : 0;
-
-  const [monthlyDataState, setMonthlyDataState] = useState<{
-    isLoading: boolean;
-    response?: MonthlyIncomeExpense[];
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: undefined,
-    error: undefined,
-  });
-
-  let averageDiff = 0;
-
-  if (
-    monthlyDataState.response == undefined ||
-    monthlyDataState.response.length === 0
-  ) {
-    console.log("No data available to calculate the average difference.");
-  } else {
-    const totalDiff = monthlyDataState.response.reduce((acc, curr) => {
-      return acc + (curr.income - curr.expense);
-    }, 0);
-
-    averageDiff = totalDiff / monthlyDataState.response.length;
-
-    console.log(`Average income-expense difference is ${averageDiff} forints`);
-  }
-
-  const [categoriesState, setCategoriesState] = useState<{
-    isLoading: boolean;
-    response: GetCategoryResponse[];
-    error: unknown;
-  }>({
-    isLoading: false,
-    response: [],
-    error: undefined,
-  });
-
-  const [monthlyCategoryState, setMonthlyCategoryState] = useState<{
-    isLoading: boolean;
-    response: MonthlyCategoryStatistics[];
-    error: unknown;
-  }>({
+  const [categoriesState, setCategoriesState] = useState<
+    FetchState<GetCategoryResponse[]>
+  >({
     isLoading: false,
     response: [],
     error: undefined,
   });
 
   const fetchCategories = async () => {
-    setCategoriesState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/category");
-      const data = await response.json();
-
-      if (data.error) {
-        setCategoriesState((previous) => ({
-          ...previous,
-          response: [],
-          error: data.error,
-        }));
-      } else {
-        setCategoriesState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setCategoriesState((previous) => ({
-        ...previous,
-        response: [],
-        error: undefined,
-      }));
-    } finally {
-      setCategoriesState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<GetCategoryResponse[]>(
+      "/api/category",
+      setCategoriesState,
+      []
+    );
   };
+
+  const [monthlyCategoryState, setMonthlyCategoryState] = useState<
+    FetchState<MonthlyCategoryStatistics[]>
+  >({
+    isLoading: false,
+    response: [],
+    error: undefined,
+  });
 
   const fetchLastYearCategoriesMonthly = async (queryString: string) => {
-    setMonthlyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch(
-        "/api/statistics/lastYearCategoryMonthly/?" + queryString
-      );
-      const data = await response.json();
-
-      if (data.error) {
-        setMonthlyCategoryState((previous) => ({
-          ...previous,
-          response: [],
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setMonthlyCategoryState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setMonthlyCategoryState((previous) => ({
-        ...previous,
-        response: [],
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setMonthlyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<MonthlyCategoryStatistics[]>(
+      "/api/statistics/lastYearCategoryMonthly" + queryString,
+      setMonthlyCategoryState,
+      []
+    );
   };
+
+  const [monthlyDataState, setMonthlyDataState] = useState<
+    FetchState<MonthlyIncomeExpense[]>
+  >({
+    isLoading: false,
+    response: [],
+    error: undefined,
+  });
 
   const fetchMonthlyStatistics = async () => {
-    setMonthlyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/statistics/lastYearMonthly");
-      const data = await response.json();
-
-      if (data.error) {
-        setMonthlyDataState((previous) => ({
-          ...previous,
-          response: undefined,
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setMonthlyDataState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setMonthlyDataState((previous) => ({
-        ...previous,
-        response: undefined,
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setMonthlyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<MonthlyIncomeExpense[]>(
+      "/api/statistics/lastYearMonthly",
+      setMonthlyDataState,
+      []
+    );
   };
 
+  const [sankeyDataState, setSankeyDataState] = useState<
+    FetchState<SankeyData>
+  >({
+    isLoading: false,
+    response: undefined,
+    error: undefined,
+  });
+
   const fetchSankeyData = async (query: string) => {
-    setSankeyDataState((previous) => ({ ...previous, isLoading: true }));
-
-    try {
-      const response = await fetch("/api/sankey?" + query);
-      const data = await response.json();
-
-      if (data.error) {
-        setSankeyDataState((previous) => ({
-          ...previous,
-          response: undefined,
-          error: data.error,
-        }));
-
-        toast("Error fetching data", {
-          description: data.error,
-        });
-      } else {
-        setSankeyDataState((previous) => ({
-          ...previous,
-          response: data,
-          error: undefined,
-        }));
-      }
-    } catch (error) {
-      setSankeyDataState((previous) => ({
-        ...previous,
-        response: undefined,
-        error: error,
-      }));
-
-      toast("Error fetching data", {
-        description: "Something went wrong",
-      });
-    } finally {
-      setSankeyDataState((previous) => ({ ...previous, isLoading: false }));
-    }
+    await fetchAndHandle<SankeyData>(
+      "/api/sankey" + query,
+      setSankeyDataState,
+      undefined
+    );
   };
 
   const [year, setYear] = useState("all");
@@ -381,15 +123,15 @@ export default function Page() {
     if (year === "all") {
       fetchSankeyData("");
     } else if (month === "all") {
-      fetchSankeyData(`year=${year}`);
+      fetchSankeyData(`?year=${year}`);
     } else {
-      fetchSankeyData(`year=${year}&month=${month}`);
+      fetchSankeyData(`?year=${year}&month=${month}`);
     }
   };
 
   useEffect(() => {
     if (selectedCategoryId) {
-      fetchLastYearCategoriesMonthly(`categoryId=${selectedCategoryId}`);
+      fetchLastYearCategoriesMonthly(`?categoryId=${selectedCategoryId}`);
     }
   }, [selectedCategoryId]);
 
@@ -424,6 +166,37 @@ export default function Page() {
       "MMMM yyyy"
     )}`;
   };
+
+  const averageDiff = useMemo(() => {
+    if (monthlyDataState.response && monthlyDataState.response.length > 0) {
+      const totalDiff = monthlyDataState.response.reduce(
+        (acc, curr) => acc + (curr.income - curr.expense),
+        0
+      );
+      return totalDiff / monthlyDataState.response.length;
+    }
+    return 0;
+  }, [monthlyDataState.response]);
+
+  const averegeCategoryDiff = useMemo(() => {
+    if (
+      monthlyCategoryState.response &&
+      monthlyCategoryState.response.length > 0
+    ) {
+      const totalCategoryDiff = monthlyCategoryState.response.reduce(
+        (acc, curr) => acc + curr.amount,
+        0
+      );
+      return totalCategoryDiff / monthlyCategoryState.response.length;
+    }
+    return 0;
+  }, [monthlyCategoryState.response]);
+
+  const sankeyHeight = useMemo(() => {
+    return sankeyDataState.response
+      ? calculateMaxNodesAtSameDistance(sankeyDataState.response)
+      : 0;
+  }, [sankeyDataState.response]);
 
   return (
     <div className="p-6 space-y-6">
@@ -537,7 +310,7 @@ export default function Page() {
 
       {/* Monthly Summary */}
 
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[80vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[70vh]">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Incomes and expenses monthly summary
@@ -573,6 +346,19 @@ export default function Page() {
                     axisLine={false}
                     tickFormatter={(value) => value.slice(0, 3)}
                   />
+                  <YAxis
+                    tickLine={true}
+                    tickMargin={5}
+                    axisLine={false}
+                    tickFormatter={(value) => {
+                      return value.toLocaleString("hu-HU", {
+                        style: "currency",
+                        currency: "HUF",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      });
+                    }}
+                  />
                   <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent indicator="dashed" />}
@@ -589,16 +375,16 @@ export default function Page() {
           )}
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Average income-expense difference is{" "}
+            Average monthly balance:{" "}
             {Math.round(averageDiff).toLocaleString("hu-HU")} HUF
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing data for the last 12 months
+            Based on data from the past 12 months
           </div>
         </CardFooter>
       </Card>
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[80vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[70vh]">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Selected category - Monthly summary
@@ -614,11 +400,15 @@ export default function Page() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Select category</SelectLabel>
-                {categoriesState.response.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
-                  </SelectItem>
-                ))}
+                {categoriesState.response &&
+                  categoriesState.response.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -629,7 +419,8 @@ export default function Page() {
             <p className="text-center text-muted">Loading...</p>
           ) : !selectedCategoryId ? (
             <p className="text-center">Select a category to view data</p>
-          ) : monthlyCategoryState.response.length === 0 ? (
+          ) : monthlyCategoryState.response === undefined ||
+            monthlyCategoryState.response.length === 0 ? (
             <p className="text-center">No data available</p>
           ) : (
             <ChartContainer config={chartConfig2}>
@@ -640,6 +431,19 @@ export default function Page() {
                   tickMargin={10}
                   axisLine={false}
                   tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <YAxis
+                  tickLine={true}
+                  tickMargin={5}
+                  axisLine={false}
+                  tickFormatter={(value) => {
+                    return value.toLocaleString("hu-HU", {
+                      style: "currency",
+                      currency: "HUF",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    });
+                  }}
                 />
                 <CartesianGrid vertical={false} />
                 <ChartTooltip
@@ -666,16 +470,29 @@ export default function Page() {
 
         <CardFooter className="flex-col items-start gap-2 text-sm">
           <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+            Average monthly amount for selected category:{" "}
+            {Math.round(averegeCategoryDiff).toLocaleString("hu-HU")} HUF
+            <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing data for the last 12 months
+            Based on data from the past 12 months
           </div>
         </CardFooter>
       </Card>
     </div>
   );
 }
+
+const chartConfig = {
+  expense: {
+    label: "Expense",
+    color: "hsl(var(--chart-1))",
+  },
+  income: {
+    label: "Income",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;
 
 const chartConfig2 = {
   visitors: {

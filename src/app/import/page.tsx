@@ -84,7 +84,10 @@ export default function Page() {
       <Card className="w-full max-w-xl">
         <CardHeader>
           <CardTitle>Import JSON Data</CardTitle>
-          <CardDescription>Select a JSON file to upload</CardDescription>
+          <CardDescription>
+            Select a JSON file to upload, only JSON data exported from Erste
+            Bank is accepted.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input type="file" accept=".json" onChange={handleFileChange} />
