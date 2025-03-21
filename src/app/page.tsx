@@ -50,7 +50,7 @@ const HomePage = () => {
           <Link className="text-2xl font-bold text-gray-600" href="/">
             FinTrack expense tracker
           </Link>
-          <Link href="/login">
+          <Link href="/auth/login">
             <Button variant="default">Sign Up</Button>
           </Link>
         </div>
