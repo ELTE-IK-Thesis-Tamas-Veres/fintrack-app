@@ -310,7 +310,7 @@ export default function Page() {
 
       {/* Monthly Summary */}
 
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[600px] h-[70vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Incomes and expenses monthly summary
@@ -384,7 +384,7 @@ export default function Page() {
           </div>
         </CardFooter>
       </Card>
-      <Card className="p-6 border rounded-lg shadow-lg bg-card min-h-[750px] h-[70vh]">
+      <Card className="p-6 border rounded-lg shadow-lg bg-card">
         <CardHeader className="mb-4">
           <CardTitle className="text-xl font-bold">
             Selected category - Monthly summary
