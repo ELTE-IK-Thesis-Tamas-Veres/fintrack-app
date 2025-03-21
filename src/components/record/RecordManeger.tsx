@@ -31,13 +31,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { EditRecordRequest, Record } from "@/types/Record";
+import {
+  CreateRecordRequest,
+  EditRecordRequest,
+  Record,
+} from "@/types/DTO/Record";
 import RecordsDataTableColumns, {
   GetRecordsDataTableColumns,
 } from "@/components/record/RecordsDataTableColumns";
 import { CreateRecordSheet } from "./CreateRecordSheet";
 import { toast } from "sonner";
-import { CreateRecordRequest } from "@/app/api/record/route";
 import { DeleteRecordDialog } from "./DeleteRecordDialog";
 import { EditRecordSheet } from "./EditRecordSheet";
 
@@ -96,8 +99,6 @@ export default function RecordManager() {
   const createRecordHandler = async (request: CreateRecordRequest) => {
     const body: CreateRecordRequest = request;
 
-    console.log(body);
-
     try {
       const response = await fetch("/api/record", {
         method: "POST",
@@ -127,8 +128,6 @@ export default function RecordManager() {
 
   const editRecordHandler = async (request: EditRecordRequest) => {
     const body: EditRecordRequest = request;
-
-    console.log(body);
 
     try {
       const response = await fetch(`/api/record/${recordToEdit?.id}`, {
@@ -182,7 +181,6 @@ export default function RecordManager() {
   };
 
   React.useEffect(() => {
-    console.log("fetching records");
     fetchRecords();
   }, []);
 

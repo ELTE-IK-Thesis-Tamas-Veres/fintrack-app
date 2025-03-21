@@ -1,5 +1,6 @@
-import { SankeyData } from "@/app/api/sankey/route";
+import { SankeyData } from "@/types/DTO/Sankey";
 import { clsx, type ClassValue } from "clsx";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -71,3 +72,52 @@ export function calculateMaxNodesAtSameDistance(data: SankeyData): number {
 
   return maxNodes;
 }
+
+export interface FetchState<T> {
+  isLoading: boolean;
+  response: T | undefined;
+  error: unknown;
+}
+
+export const fetchAndHandle = async <T>(
+  url: string,
+  setState: React.Dispatch<React.SetStateAction<FetchState<T>>>,
+  fallbackResponse: T | undefined
+): Promise<void> => {
+  setState((prev) => ({ ...prev, isLoading: true }));
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.error) {
+      setState((prev) => ({
+        ...prev,
+        response: fallbackResponse,
+        error: data.error,
+      }));
+
+      toast("Error fetching data", {
+        description: data.error,
+      });
+    } else {
+      setState((prev) => ({
+        ...prev,
+        response: data,
+        error: undefined,
+      }));
+    }
+  } catch (error) {
+    setState((prev) => ({
+      ...prev,
+      response: fallbackResponse,
+      error: error,
+    }));
+
+    toast("Error fetching data", {
+      description: "Something went wrong",
+    });
+  } finally {
+    setState((prev) => ({ ...prev, isLoading: false }));
+  }
+};
