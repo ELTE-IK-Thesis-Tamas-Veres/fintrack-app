@@ -46,24 +46,9 @@ import {
   MonthlyIncomeExpense,
 } from "@/types/DTO/Statistics";
 import { GetCategoryResponse } from "@/types/DTO/Category";
+import { SelectCategoryComboBox } from "@/components/record/SelectCategoryComboBox";
 
 export default function Page() {
-  const [categoriesState, setCategoriesState] = useState<
-    FetchState<GetCategoryResponse[]>
-  >({
-    isLoading: false,
-    response: [],
-    error: undefined,
-  });
-
-  const fetchCategories = async () => {
-    await fetchAndHandle<GetCategoryResponse[]>(
-      "/api/category",
-      setCategoriesState,
-      []
-    );
-  };
-
   const [monthlyCategoryState, setMonthlyCategoryState] = useState<
     FetchState<MonthlyCategoryStatistics[]>
   >({
@@ -115,9 +100,8 @@ export default function Page() {
   const [year, setYear] = useState("all");
   const [month, setMonth] = useState("all");
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<
-    string | undefined
-  >(undefined);
+  const [selectedCategory, setSelectedCategory] =
+    useState<GetCategoryResponse | null>(null);
 
   const handleSankeyFilter = () => {
     if (year === "all") {
@@ -130,15 +114,14 @@ export default function Page() {
   };
 
   useEffect(() => {
-    if (selectedCategoryId) {
-      fetchLastYearCategoriesMonthly(`?categoryId=${selectedCategoryId}`);
+    if (selectedCategory) {
+      fetchLastYearCategoriesMonthly(`?categoryId=${selectedCategory.id}`);
     }
-  }, [selectedCategoryId]);
+  }, [selectedCategory]);
 
   useEffect(() => {
     fetchSankeyData("");
     fetchMonthlyStatistics();
-    fetchCategories();
   }, []);
 
   const months = [
@@ -386,38 +369,25 @@ export default function Page() {
       </Card>
       <Card className="p-6 border rounded-lg shadow-lg bg-card">
         <CardHeader className="mb-4">
-          <CardTitle className="text-xl font-bold">
-            Selected category - Monthly summary
-          </CardTitle>
-          <CardDescription>{getTimePeriodDescription()}</CardDescription>
+          <div className="flex items-center justify-between w-full">
+            <div>
+              <CardTitle className="text-xl font-bold">
+                Selected category - Monthly summary
+              </CardTitle>
+              <CardDescription>{getTimePeriodDescription()}</CardDescription>
+            </div>
+            <SelectCategoryComboBox
+              setSelectedCategory={setSelectedCategory}
+              selectedCategory={selectedCategory}
+              label={false}
+            />
+          </div>
         </CardHeader>
-
-        <div className="mb-4">
-          <Select onValueChange={(value) => setSelectedCategoryId(value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Select category</SelectLabel>
-                {categoriesState.response &&
-                  categoriesState.response.map((category) => (
-                    <SelectItem
-                      key={category.id}
-                      value={category.id.toString()}
-                    >
-                      {category.name}
-                    </SelectItem>
-                  ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
 
         <CardContent>
           {monthlyCategoryState.isLoading ? (
             <p className="text-center text-muted">Loading...</p>
-          ) : !selectedCategoryId ? (
+          ) : !selectedCategory ? (
             <p className="text-center">Select a category to view data</p>
           ) : monthlyCategoryState.response === undefined ||
             monthlyCategoryState.response.length === 0 ? (

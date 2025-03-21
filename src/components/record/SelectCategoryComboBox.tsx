@@ -23,10 +23,12 @@ export function SelectCategoryComboBox({
   initiallySelectedCategoryId,
   selectedCategory,
   setSelectedCategory,
+  label,
 }: {
   initiallySelectedCategoryId?: number;
   selectedCategory: GetCategoryResponse | null;
   setSelectedCategory: (category: GetCategoryResponse | null) => void;
+  label: boolean;
 }) {
   const [categoriesState, setCategoriesState] = React.useState<{
     isLoading: boolean;
@@ -90,7 +92,7 @@ export function SelectCategoryComboBox({
 
   return (
     <>
-      <Label className="text-right">Status</Label>
+      {label && <Label className="text-right">Category</Label>}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-[150px] justify-start">

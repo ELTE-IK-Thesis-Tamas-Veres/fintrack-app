@@ -33,15 +33,15 @@ import { Calendar } from "../ui/calendar";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
 import { GetCategoryResponse } from "@/types/DTO/Category";
 import { CreateRecordRequest } from "@/types/DTO/Record";
+import { toast } from "sonner";
 
 export function CreateRecordSheet({
   createRecordHandler,
 }: {
   createRecordHandler: (request: CreateRecordRequest) => Promise<void>;
 }) {
-  const [description, setDescription] =
-    React.useState<string>("set description");
-  const [amount, setAmount] = React.useState<number>(1234);
+  const [description, setDescription] = React.useState<string>("");
+  const [amount, setAmount] = React.useState<string>("");
   const today: Date = new Date();
   const [date, setDate] = React.useState<Date>(today);
   const [selectedCategory, setSelectedCategory] =
@@ -50,14 +50,21 @@ export function CreateRecordSheet({
   const submitHandler = async () => {
     const formattedDate = date.toISOString().split("T")[0];
 
-    const body: CreateRecordRequest = {
-      amount: amount,
-      categoryId: selectedCategory ? selectedCategory.id : null,
-      date: formattedDate,
-      description: description,
-    };
+    const parsed = parseInt(amount, 10);
+    if (isNaN(parsed)) {
+      toast("Error creating record", {
+        description: "Amount must be a number",
+      });
+    } else {
+      const body: CreateRecordRequest = {
+        amount: parseInt(amount, 10),
+        categoryId: selectedCategory ? selectedCategory.id : null,
+        date: formattedDate,
+        description: description,
+      };
 
-    await createRecordHandler(body);
+      await createRecordHandler(body);
+    }
   };
 
   return (
@@ -81,6 +88,7 @@ export function CreateRecordSheet({
               onChange={(e) => {
                 setDescription(e.target.value);
               }}
+              placeholder=" set description"
               id="description"
               value={description}
               className="col-span-3"
@@ -91,25 +99,18 @@ export function CreateRecordSheet({
               Amount
             </Label>
             <Input
+              placeholder=" set amount"
               onChange={(e) => {
-                const value = e.target.value.trim(); // Remove unnecessary spaces
-                const parsed = parseInt(value, 10);
+                const value = e.target.value; // Remove unnecessary spaces
 
-                // Check if parsed is a valid number and matches the input
-                if (!isNaN(parsed) && value === parsed.toString()) {
-                  setAmount(parsed);
-                } else if (value === "") {
-                  setAmount(0);
-                } else if (value.startsWith("0")) {
-                  const sliced = value.slice(1);
-                  const slicedParsed = parseInt(sliced);
+                const validNumberRegex = /^-?(?:\d+|\d*\.\d+)$/;
 
-                  if (
-                    !isNaN(slicedParsed) &&
-                    sliced === slicedParsed.toString()
-                  ) {
-                    setAmount(slicedParsed);
-                  }
+                if (
+                  validNumberRegex.test(value) ||
+                  value === "-" ||
+                  value === ""
+                ) {
+                  setAmount(value);
                 }
               }}
               id="username"
@@ -121,6 +122,7 @@ export function CreateRecordSheet({
             <SelectCategoryComboBox
               setSelectedCategory={setSelectedCategory}
               selectedCategory={selectedCategory}
+              label={true}
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -183,7 +185,7 @@ export function CreateRecordSheet({
             type="submit"
             variant={"default"}
           >
-            Save changes
+            Add
           </Button>
         </SheetFooter>
       </SheetContent>
