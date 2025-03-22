@@ -124,11 +124,11 @@ const Navbar = () => {
                 </DropdownMenuItem>
               ))}
               {user &&
-            authNavItems.map((item) => (
-              <li key={item.href} className={isActive(item.href)}>
-                <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
+                authNavItems.map((item) => (
+                  <DropdownMenuItem asChild key={item.href}>
+                    <Link href={item.href}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
               {!user && (
                 <>
                   <DropdownMenuItem asChild>
