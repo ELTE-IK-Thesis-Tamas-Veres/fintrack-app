@@ -10,7 +10,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useUser } from "@auth0/nextjs-auth0";
 
 const HomePage = () => {
@@ -28,18 +28,18 @@ const HomePage = () => {
   } satisfies ChartConfig;
 
   const chartData = [
-    { month: "January", income: 186, expense: 80 },
-    { month: "February", income: 305, expense: 200 },
-    { month: "March", income: 237, expense: 120 },
-    { month: "April", income: 73, expense: 190 },
-    { month: "May", income: 209, expense: 130 },
-    { month: "June", income: 214, expense: 140 },
-    { month: "July", income: 186, expense: 80 },
-    { month: "August", income: 305, expense: 200 },
-    { month: "September", income: 237, expense: 120 },
-    { month: "October", income: 73, expense: 190 },
-    { month: "November", income: 209, expense: 130 },
-    { month: "December", income: 214, expense: 140 },
+    { month: "January", income: 186000, expense: 80000 },
+    { month: "February", income: 305000, expense: 200000 },
+    { month: "March", income: 237000, expense: 120000 },
+    { month: "April", income: 73000, expense: 190000 },
+    { month: "May", income: 209000, expense: 130000 },
+    { month: "June", income: 214000, expense: 140000 },
+    { month: "July", income: 186000, expense: 80000 },
+    { month: "August", income: 305000, expense: 200000 },
+    { month: "September", income: 237000, expense: 120000 },
+    { month: "October", income: 73000, expense: 190000 },
+    { month: "November", income: 209000, expense: 130000 },
+    { month: "December", income: 214000, expense: 140000 },
   ];
 
   return (
@@ -50,7 +50,7 @@ const HomePage = () => {
           <Link className="text-2xl font-bold text-gray-600" href="/">
             FinTrack expense tracker
           </Link>
-          <Link href="/login">
+          <Link href="/auth/login">
             <Button variant="default">Sign Up</Button>
           </Link>
         </div>
@@ -93,14 +93,34 @@ const HomePage = () => {
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="month"
-                    tickLine={false}
+                    tickLine={true}
                     tickMargin={10}
                     axisLine={false}
                     tickFormatter={(value) => value.slice(0, 3)}
                   />
-                  <Bar fill="var(--color-income)" dataKey="income" />
-                  <Bar fill="var(--color-expense)" dataKey="expense" />
-                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <YAxis
+                    tickLine={true}
+                    tickMargin={5}
+                    axisLine={false}
+                    tickFormatter={(value) => {
+                      return value.toLocaleString("hu-HU", {
+                        style: "currency",
+                        currency: "HUF",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      });
+                    }}
+                  />
+                  <Bar
+                    dataKey="expense"
+                    fill="var(--color-expense)"
+                    radius={4}
+                  />
+                  <Bar dataKey="income" fill="var(--color-income)" radius={4} />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="dashed" />}
+                  />
                 </BarChart>
               </ChartContainer>
             </CardContent>

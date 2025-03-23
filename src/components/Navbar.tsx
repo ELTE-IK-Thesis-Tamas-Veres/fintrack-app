@@ -13,8 +13,9 @@ import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Image from "next/image";
 
-const navItems = [
-  { label: "Home", href: "/" },
+const navItems = [{ label: "Home", href: "/" }];
+
+const authNavItems = [
   { label: "Categories", href: "/categories" },
   { label: "Records", href: "/records" },
   { label: "Statistics", href: "/statistics" },
@@ -61,6 +62,12 @@ const Navbar = () => {
               <Link href={item.href}>{item.label}</Link>
             </li>
           ))}
+          {user &&
+            authNavItems.map((item) => (
+              <li key={item.href} className={isActive(item.href)}>
+                <Link href={item.href}>{item.label}</Link>
+              </li>
+            ))}
         </ul>
       </div>
 
@@ -116,13 +123,16 @@ const Navbar = () => {
                   <Link href={item.href}>{item.label}</Link>
                 </DropdownMenuItem>
               ))}
+              {user &&
+                authNavItems.map((item) => (
+                  <DropdownMenuItem asChild key={item.href}>
+                    <Link href={item.href}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
               {!user && (
                 <>
                   <DropdownMenuItem asChild>
                     <Link href="/auth/login">Login</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Button className="w-full text-sm">Get Started</Button>
                   </DropdownMenuItem>
                 </>
               )}

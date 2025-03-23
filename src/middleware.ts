@@ -11,11 +11,12 @@ export async function middleware(request: NextRequest) {
 
   const session = await auth0.getSession(request);
 
-  if (!session && false) {
-    // user is not authenticated, redirect to login page
-    return NextResponse.redirect(
-      new URL("/auth/login", request.nextUrl.origin)
-    );
+  if (
+    !session &&
+    !request.nextUrl.pathname.startsWith("/api") &&
+    request.nextUrl.pathname !== "/"
+  ) {
+    return NextResponse.redirect(new URL("/", request.nextUrl.origin));
   }
 
   if (request.nextUrl.pathname.startsWith("/api")) {
@@ -57,6 +58,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|images).*)",
   ],
 };
