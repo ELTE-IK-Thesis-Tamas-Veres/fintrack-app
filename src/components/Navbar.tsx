@@ -134,9 +134,6 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link href="/auth/login">Login</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Button className="w-full text-sm">Get Started</Button>
-                  </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
