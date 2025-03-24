@@ -199,6 +199,7 @@ export function EditRecordSheet({
               onClick={() => submitHandler()}
               type="submit"
               variant={"default"}
+              className="mb-3"
             >
               Save changes
             </Button>

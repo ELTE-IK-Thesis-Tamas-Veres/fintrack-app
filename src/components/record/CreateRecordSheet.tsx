@@ -184,6 +184,7 @@ export function CreateRecordSheet({
             onClick={() => submitHandler()}
             type="submit"
             variant={"default"}
+            className="mb-3"
           >
             Add
           </Button>
