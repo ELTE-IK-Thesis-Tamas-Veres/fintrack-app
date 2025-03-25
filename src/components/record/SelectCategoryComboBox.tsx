@@ -103,7 +103,7 @@ export function SelectCategoryComboBox({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-0" side="right" align="start">
+        <PopoverContent className="w-[200px] p-0">
           <Command>
             <CommandInput placeholder="Change status..." />
             <CommandList>

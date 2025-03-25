@@ -121,3 +121,10 @@ export const fetchAndHandle = async <T>(
     setState((prev) => ({ ...prev, isLoading: false }));
   }
 };
+
+export const getFormattedDate = (date: Date): string => {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const formattedDate = localDate.toISOString().split("T")[0];
+
+  return formattedDate;
+};
