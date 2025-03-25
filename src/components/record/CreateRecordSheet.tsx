@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn } from "@/lib/utils";
+import { cn, getFormattedDate } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
 import { GetCategoryResponse } from "@/types/DTO/Category";
@@ -48,7 +48,10 @@ export function CreateRecordSheet({
     React.useState<GetCategoryResponse | null>(null);
 
   const submitHandler = async () => {
-    const formattedDate = date.toISOString().split("T")[0];
+    const formattedDate = getFormattedDate(date);
+
+    console.log(date);
+    console.log(formattedDate);
 
     const parsed = parseInt(amount, 10);
     if (isNaN(parsed)) {

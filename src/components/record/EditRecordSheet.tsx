@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn } from "@/lib/utils";
+import { cn, getFormattedDate } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { SelectCategoryComboBox } from "./SelectCategoryComboBox";
 
@@ -63,7 +63,7 @@ export function EditRecordSheet({
   }, [original]);
 
   const submitHandler = async () => {
-    const formattedDate = date.toISOString().split("T")[0];
+    const formattedDate = getFormattedDate(date);
 
     const parsed = parseInt(amount, 10);
     if (isNaN(parsed)) {
