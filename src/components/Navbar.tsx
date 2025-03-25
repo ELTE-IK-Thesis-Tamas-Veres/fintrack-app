@@ -81,7 +81,6 @@ const Navbar = () => {
             >
               <Link href="/auth/login">Login</Link>
             </Button>
-            <Button className="hidden md:block ml-2 mr-2">Get Started</Button>
           </>
         ) : (
           <>
