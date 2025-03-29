@@ -4,7 +4,8 @@ FROM nginx:latest
 RUN rm /etc/nginx/conf.d/*
 
 # Copy your custom nginx configuration into the image
-COPY nginx.conf /etc/nginx/nginx.conf
+ARG NGINX_CONF
+COPY ${NGINX_CONF} /etc/nginx/nginx.conf
 
 # Expose HTTP and HTTPS ports
 EXPOSE 80 443
