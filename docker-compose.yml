@@ -14,7 +14,7 @@ services:
     build:
       context: ./nginx
       args:
-        NGINX_CONF: ${SSL_CERTS_PATH}
+        NGINX_CONF: ${NGINX_CONF}
     container_name: nginx
     ports:
       - "80:80"
