@@ -14,7 +14,7 @@ services:
     build:
       context: ./nginx
       args:
-        NGINX_CONF: ${NGINX_CONF}
+        NGINX_CONF: ${SSL_CERTS_PATH}
     container_name: nginx
     ports:
       - "80:80"
@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ${SSL_CERTS_PATH}:/etc/letsencrypt:ro
     depends_on:
       - fintrack-app
     networks:
