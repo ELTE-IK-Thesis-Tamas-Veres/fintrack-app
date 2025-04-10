@@ -3,8 +3,6 @@
 services:
   fintrack-app:
     build: .
-    ports:
-      - "3000:3000"
     env_file:
       - .env
     image: fintrack-app:latest
@@ -21,6 +19,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "3306:3306"
     env_file:
       - .env
     volumes:
