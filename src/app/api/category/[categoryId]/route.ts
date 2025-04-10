@@ -10,18 +10,9 @@ export const PUT = async (
     const { categoryId } = await params;
     const body: EditCategoryRequest = await req.json();
 
-    const resp = await callFinTrackServices(
-      req,
-      `category/${categoryId}`,
-      "PUT",
-      body
-    );
+    await callFinTrackServices(req, `category/${categoryId}`, "PUT", body);
 
-    if (!resp) {
-      return new NextResponse(null, { status: 204 });
-    }
-
-    return NextResponse.json(resp, { status: 200 });
+    return NextResponse.json("Category updated successfully", { status: 200 });
   } catch (error: unknown) {
     return NextResponse.json(
       { error: (error as Error).message },
@@ -36,15 +27,7 @@ export const DELETE = async (
 ) => {
   try {
     const { categoryId } = await params;
-    const resp = await callFinTrackServices(
-      req,
-      `category/${categoryId}`,
-      "DELETE"
-    );
-
-    if (!resp) {
-      return new NextResponse(null, { status: 204 });
-    }
+    await callFinTrackServices(req, `category/${categoryId}`, "DELETE");
 
     return NextResponse.json(
       { message: "Category deleted successfully" },
