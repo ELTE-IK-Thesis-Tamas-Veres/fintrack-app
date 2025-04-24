@@ -89,7 +89,6 @@ const HomePage = () => {
               <CardTitle>Monthly Financial Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              {/* Using shadcn charts */}
               <ChartContainer config={chartConfig}>
                 <BarChart data={chartData}>
                   <CartesianGrid vertical={false} />

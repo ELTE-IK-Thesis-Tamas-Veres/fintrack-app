@@ -18,7 +18,6 @@ export async function callFinTrackServices<T>(
     }
 
     console.log("➡️  API Request:", method, `${apiEndpoint}${endpoint}`);
-    //console.log("📦 Request Body:", body);
 
     const requestOptions: RequestInit = {
       method,

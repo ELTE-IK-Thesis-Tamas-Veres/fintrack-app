@@ -3,7 +3,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-//import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -81,7 +80,6 @@ export const GetRecordsDataTableColumns = (
       cell: ({ row }) => {
         const amount = parseInt(row.getValue("amount"));
 
-        // Format the amount as a HUF amount
         const formatted = new Intl.NumberFormat("hu-HU", {
           style: "currency",
           currency: "HUF",

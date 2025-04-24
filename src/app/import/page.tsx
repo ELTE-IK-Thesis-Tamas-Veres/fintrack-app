@@ -25,7 +25,6 @@ export default function Page() {
   const [jsonData, setJsonData] = useState<JSONValue>(null);
   const [loading, setLoading] = useState(false);
 
-  // Handle File Selection
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
 
@@ -50,7 +49,6 @@ export default function Page() {
     }
   };
 
-  // Handle Upload
   const handleUpload = async () => {
     if (!file) {
       toast.error("No file selected");

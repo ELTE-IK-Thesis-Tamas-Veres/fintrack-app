@@ -193,8 +193,8 @@ export default function RecordManager() {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const [pagination, setPagination] = React.useState({
-    pageIndex: 0, //initial page index
-    pageSize: 10, //default page size
+    pageIndex: 0,
+    pageSize: 10,
   });
 
   const table = useReactTable({
@@ -225,7 +225,6 @@ export default function RecordManager() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* 📌 Header Section */}
       <header className="mb-6">
         <h1 className="text-3xl font-bold">Manage Records</h1>
         <p className="text-muted-foreground">
@@ -361,10 +360,6 @@ export default function RecordManager() {
         )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        {/* <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div> */}
         <div className="space-x-2">
           <Button
             variant="outline"

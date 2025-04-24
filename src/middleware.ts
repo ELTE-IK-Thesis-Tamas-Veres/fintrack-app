@@ -26,7 +26,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 🔥 Get Access Token and ensure it's refreshed
     const { token } = await auth0.getAccessToken(request, authRes);
 
     if (!token) {

@@ -142,7 +142,7 @@ export default function Page() {
   const getTimePeriodDescription = () => {
     const currentDate = new Date();
     const startDate = new Date();
-    startDate.setMonth(currentDate.getMonth() - 11); // Get 12 months ago
+    startDate.setMonth(currentDate.getMonth() - 11);
 
     return `${format(startDate, "MMMM yyyy")} - ${format(
       currentDate,
@@ -212,7 +212,7 @@ export default function Page() {
             </SelectContent>
           </Select>
 
-          {/* Month Selector (Only visible if a year is selected) */}
+          {/* Month Selector */}
           {year !== "all" && (
             <Select onValueChange={(value) => setMonth(value)}>
               <SelectTrigger className="w-full">
