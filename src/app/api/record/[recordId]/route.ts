@@ -33,7 +33,7 @@ export const PUT = async (
 
 export const DELETE = async (
   req: Request,
-  { params }: { params: Promise<{ recordId: number }> }
+  { params }: { params: Promise<{ recordId: string }> }
 ) => {
   const { recordId } = await params;
 
